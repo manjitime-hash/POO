@@ -1,1 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
 
+int entrada();
+int jugamento(int n);
+int conclusao(); 
+
+int main() {
+    entrada();
+    return 0;
+}
+
+int entrada() {
+    int cnum = 1, cont = 1, num = 0;//cnum=1 pq nao lemos o numero 
+    
+    puts("Qual numero deseja verificar se é primo?");
+    scanf("%d", &num);  
+    
+    if (num < 2) {
+        jugamento(num);
+        conclusao();
+        return 0;  // Adicionei return para evitar execução duplicada
+    }
+    
+    printf("Esse numero é divisível por:\n[");
+    do {
+        if (num % cont == 0) {
+            cnum++;
+            printf("%d,", cont);
+        }
+        cont++;
+    } while (cont < num);  // Corrigi a condição do loop
+    
+    printf("%d]",num);  // Usei \b para remover a vírgula extra
+    printf("cnum:%d",cnum);
+    cnum == 2 ?
+    puts("\nLogo é primo") :
+    puts("\nLogo não é primo");
+    
+    conclusao();
+    
+    return 0;
+}
+
+int jugamento(int n) {
+    if (n == 0) {
+        puts("Não é primo, pois 0 é um dividendo universal");
+    } else if (n == 1) {
+        puts("1 não é primo por definição");
+    } else {
+        printf("%d por definição não é primo\n", n);  // Corrigi o printf
+    }
+    
+   
+    return 0;
+} 
+
+int conclusao() {
+    char p;
+    getchar() != '\n';//limpar buffer se não pq se não o scanf ler /n do puts
+    puts("Deseja verificar mais números? (y/n)");
+    scanf(" %c", &p);  
+    
+    if (p == 'y' || p == 'Y') {
+        entrada();
+    } else if (p == 'n' || p == 'N') {
+        exit(0);
+    } else {
+        puts("Entrada inválida, por favor usar y ou n");
+        conclusao();
+    }
+    
+    return 0;
+}
