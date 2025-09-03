@@ -32,7 +32,6 @@ int entrada() {
     } while (cont < num);  // Corrigi a condição do loop
     
     printf("%d]",num);  // Usei \b para remover a vírgula extra
-    printf("cnum:%d",cnum);
     cnum == 2 ?
     puts("\nLogo é primo") :
     puts("\nLogo não é primo");
