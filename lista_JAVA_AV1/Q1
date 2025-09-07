@@ -30,8 +30,8 @@ public class Main {
         
         limparTela();
         
-        System.out.println("Maior número: " + resultados[0]);
-        System.out.println("Menor número: " + resultados[1]);
+        System.out.printf("Maior número: %15.2f%n", resultados[0]);
+        System.out.printf("Menor número: %15.2f%n", resultados[1]);
         
         return perguntarSeDesejaContinuar();
     }
