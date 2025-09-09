@@ -61,7 +61,7 @@ public class Main {
         String resposta;
         do {
             System.out.print("\nDeseja executar novamente? (S/N): ");
-            resposta = teclado.next().toUpperCase();
+            resposta = teclado.next().toUpperCase();\\tudo lido como maiusculo 
             
             // Limpar o buffer do teclado
             teclado.nextLine();
