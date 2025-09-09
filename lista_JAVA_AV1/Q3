@@ -1,0 +1,97 @@
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        System.out.print("Qual número deseja verificar se é primo? ");
+        int num = teclado.nextInt();
+        teclado.nextLine(); // Limpar buffer
+        
+        if (num < 2) {
+            jugamento(num);
+        } else {
+            verificarPrimo(num);
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static void verificarPrimo(int num) {
+        int cnum = 1;
+        int cont = 1;
+        
+        System.out.print("Esse número é divisível por:\n[");
+        do {
+            if (num % cont == 0) {
+                cnum++;
+                System.out.print(cont + ",");
+            }
+            cont++;
+        } while (cont < num);
+        
+        System.out.print(num + "]");
+        
+        if (cnum == 2) {
+            System.out.println("\nLogo é primo");
+        } else {
+            System.out.println("\nLogo não é primo");
+        }
+    }
+    
+    public static void jugamento(int n) {
+        if (n == 0) {
+            System.out.println("Não é primo, pois 0 é um dividendo universal");
+        } else if (n == 1) {
+            System.out.println("1 não é primo por definição");
+        } else {
+            System.out.println(n + " por definição não é primo");
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            
+            System.out.print("\nDeseja verificar mais números? (y/n): ");
+            resposta = teclado.next().toUpperCase(); // tudo lido como maiusculo 
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("Y")) {
+                limparTela();
+                return true;
+            } else if (resposta.equals("N")) {
+                return false;
+            } else {
+                System.out.println("Entrada inválida, por favor usar y ou n");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
