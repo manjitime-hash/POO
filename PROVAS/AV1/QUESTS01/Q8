@@ -1,0 +1,115 @@
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         PLANILHA DE NOTAS            ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Solicitar quantidade de alunos
+        System.out.print("Digite a quantidade de alunos: ");
+        int qntdAlunos = teclado.nextInt();
+        
+        // Solicitar quantidade de notas
+        System.out.print("Digite a quantidade de notas por aluno: ");
+        int qntdNotas = teclado.nextInt();
+        
+        // Validar entradas
+        if(qntdAlunos <= 0 || qntdNotas <= 0) {
+            System.out.println("Erro! A quantidade de alunos e notas deve ser maior que zero.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        float[][] planilhaNotas = new float[qntdAlunos][qntdNotas];
+        
+        // Preencher a planilha de notas
+        for(int aluno = 0; aluno < qntdAlunos; aluno++) {
+            limparTela();
+            System.out.println("Notas do Aluno " + (aluno + 1) + ":");
+            
+            for(int nota = 0; nota < qntdNotas; nota++ ) {
+                System.out.printf("Av%d: ", nota + 1);    
+                planilhaNotas[aluno][nota] = teclado.nextFloat();
+            }
+        }
+        
+        // Exibir a planilha de notas
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         RESULTADO - NOTAS            ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Cabeçalho com as avaliações
+        System.out.print("Aluno\t");
+        for(int nota = 0; nota < qntdNotas; nota++) {
+            System.out.printf("Av%d\t", nota + 1);
+        }
+        System.out.println("Média");
+        
+        // Linhas com as notas de cada aluno
+        for(int aluno = 0; aluno < qntdAlunos; aluno++) {
+            System.out.printf("%d\t", aluno + 1);
+            float soma = 0;
+            
+            for(int nota = 0; nota < qntdNotas; nota++) {
+                System.out.printf("%.1f\t", planilhaNotas[aluno][nota]);
+                soma += planilhaNotas[aluno][nota];
+            }
+            
+            // Calcular e exibir a média
+            float media = soma / qntdNotas;
+            System.out.printf("%.1f%n", media);
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
