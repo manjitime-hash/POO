@@ -1,1 +1,87 @@
+import java.util.Scanner;
 
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        System.out.print("Digite o limite inferior do intervalo: ");
+        double limiteInferior = teclado.nextDouble();
+        
+        System.out.print("Digite o limite superior do intervalo: ");
+        double limiteSuperior = teclado.nextDouble();
+        
+        if(limiteInferior >= limiteSuperior) {
+            limparTela();
+            System.out.println("Erro! O limite inferior deve ser menor que o limite superior.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        System.out.print("Digite o número a ser verificado: ");
+        double numero = teclado.nextDouble();
+        
+        boolean resultado = verificarNumeroNoIntervalo(limiteInferior, limiteSuperior, numero);
+        exibirResultado(limiteInferior, limiteSuperior, numero, resultado);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean verificarNumeroNoIntervalo(double limiteInferior, double limiteSuperior, double numero) {
+        return (numero >= limiteInferior && numero <= limiteSuperior);
+    }
+    
+    public static void exibirResultado(double limiteInferior, double limiteSuperior, double numero, boolean resultado) {
+        limparTela();
+        System.out.printf("Intervalo definido de %.2f até %.2f %n%n", limiteInferior, limiteSuperior);
+        
+        if (resultado) {
+            System.out.printf("O número %.2f está DENTRO do intervalo.%n", numero);
+        } else {
+            System.out.printf("O número %.2f está FORA do intervalo.%n", numero);
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                limparTela();
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
