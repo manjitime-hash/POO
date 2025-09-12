@@ -1,0 +1,165 @@
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║        CONVERSOR DE TEMPERATURA      ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Primeiro pedir a escala de origem
+        System.out.println("\nEscalas disponíveis:");
+        System.out.println("C - Celsius");
+        System.out.println("F - Fahrenheit");
+        System.out.println("K - Kelvin");
+        
+        String escalaAtual = lerEscala("Digite a escala de ORIGEM (C/F/K): ");
+        double temperatura = lerTemperatura(escalaAtual);
+        
+        String escalaDestino = lerEscala("Digite a escala de DESTINO (C/F/K): ");
+        
+        // Se as escalas forem iguais
+        if (escalaAtual.equals(escalaDestino)) {
+            System.out.println("As escalas são iguais. Não há conversão necessária.");
+            System.out.println("Temperatura: " + temperatura + "°" + escalaAtual);
+            return perguntarSeDesejaContinuar();
+        }
+        
+        // Realizar a conversão
+        double resultado = converterTemperatura(temperatura, escalaAtual, escalaDestino);
+        
+        // Exibir o resultado
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           RESULTADO DA CONVERSÃO     ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.printf("  %.2f°%s = %.2f°%s%n", temperatura, escalaAtual, resultado, escalaDestino);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    // Função para ler e validar uma escala
+    public static String lerEscala(String mensagem) {
+        String escala;
+        do {
+            System.out.print(mensagem);
+            escala = teclado.next().toUpperCase();
+            
+            if (escala.equals("C") || escala.equals("F") || escala.equals("K")) {
+                return escala;
+            } else {
+                System.out.println("Escala inválida! Use apenas C, F ou K.");
+                teclado.nextLine(); // Limpar buffer
+            }
+        } while (true);
+    }
+    
+    // Função para ler e validar uma temperatura de acordo com a escala
+    public static double lerTemperatura(String escala) {
+        double temperatura;
+        do {
+            System.out.print("Digite a temperatura em " + escala + ": ");
+            
+            if (teclado.hasNextDouble()) {
+                temperatura = teclado.nextDouble();
+                
+                // Validar de acordo com a escala
+                if (escala.equals("K") && temperatura < 0) {
+                    System.out.println("Erro: A temperatura em Kelvin não pode ser negativa!");
+                    System.out.println("O zero absoluto é 0K (-273.15°C)");
+                } else if (escala.equals("C") && temperatura < -273.15) {
+                    System.out.println("Aviso: Esta temperatura está abaixo do zero absoluto (-273.15°C)!");
+                    System.out.println("A conversão será realizada, mas é fisicamente impossível.");
+                    return temperatura;
+                } else if (escala.equals("F") && temperatura < -459.67) {
+                    System.out.println("Aviso: Esta temperatura está abaixo do zero absoluto (-459.67°F)!");
+                    System.out.println("A conversão será realizada, mas é fisicamente impossível.");
+                    return temperatura;
+                } else {
+                    return temperatura;
+                }
+            } else {
+                System.out.println("Valor inválido! Digite um número.");
+                teclado.next(); // Limpar o valor inválido
+            }
+        } while (true);
+    }
+    
+    public static double converterTemperatura(double temp, String origem, String destino) {
+        // Converter para Celsius primeiro (como ponto intermediário)
+        double celsius;
+        
+        switch (origem) {
+            case "C":
+                celsius = temp;
+                break;
+            case "F":
+                celsius = (temp - 32) / 1.8;
+                break;
+            case "K":
+                celsius = temp - 273.15;
+                break;
+            default:
+                celsius = temp;
+        }
+        
+        // Converter de Celsius para a escala de destino
+        switch (destino) {
+            case "C":
+                return celsius;
+            case "F":
+                return celsius * 1.8 + 32;
+            case "K":
+                return celsius + 273.15;
+            default:
+                return celsius;
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja converter outra temperatura? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
