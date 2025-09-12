@@ -1,0 +1,76 @@
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela(); // Limpa a tela no início de cada execução
+        
+        int numero;
+        boolean entradaValida = false;
+        
+        do {
+            System.out.print("Digite um número entre 12 e 20: ");
+            numero = teclado.nextInt();
+            
+            if (numero >= 12 && numero <= 20) {
+                entradaValida = true;
+            } else {
+                limparTela(); // Limpa a tela após entrada inválida
+                System.out.println("Entrada inválida!");
+                // Limpar o buffer do teclado
+                teclado.nextLine();
+            }
+        } while (!entradaValida);
+        
+        limparTela(); // Limpa a tela antes de mostrar o resultado
+        System.out.println("Número digitado: " + numero);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
