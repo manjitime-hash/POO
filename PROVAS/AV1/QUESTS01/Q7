@@ -1,0 +1,116 @@
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+       
+        
+        // Variáveis para armazenar os dados
+        int quantidade = 0;
+        double soma = 0;
+        int menor = Integer.MAX_VALUE;
+        int maior = Integer.MIN_VALUE;
+        
+        // Ler idades até que seja digitado 0
+        while (true) {
+             System.out.print("╔════════════════════════════════════╗\n" +
+                        "║        ANÁLISE DE IDADES            ║\n" +
+                        "╚════════════════════════════════════╝\n" +
+                        "Digite a idade (0 para encerrar a leitura):\n"+
+                        "Idade da pessoa " + (quantidade + 1) + ": ");
+            int idade = teclado.nextInt();
+            limparTela();
+            
+            // Verificar se é o código de parada
+            if (idade == 0) {
+                break;
+            }
+            
+            // Validar se a idade é positiva
+            if (idade < 0) {
+                System.out.println("Idade inválida! Digite uma idade positiva ou 0 para encerrar.");
+                continue;
+            }
+            
+            // Atualizar estatísticas
+            quantidade++;
+            soma += idade;
+            
+            if (idade < menor) {
+                menor = idade;
+            }
+            
+            if (idade > maior) {
+                maior = idade;
+            }
+        }
+        
+        // Verificar se pelo menos uma idade foi informada
+        if (quantidade == 0) {
+            limparTela();
+            System.out.println("Nenhuma idade foi informada.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        // Calcular a média
+        double media = soma / quantidade;
+        
+        // Exibir resultados com um único print
+        limparTela();
+        System.out.print("╔═════════════════════════════════════╗\n" +
+                        "║           RESULTADOS                 ║\n" +
+                        "╚═════════════════════════════════════╝\n" +
+                        "a. Número de pessoas: " + quantidade + "\n" +
+                        "b. Idade média do grupo: " + String.format("%.2f", media) + " anos\n" +
+                        "c. Menor idade: " + menor + " anos\n" +
+                        "   Maior idade: " + maior + " anos\n");
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
