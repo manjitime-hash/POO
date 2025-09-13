@@ -1,0 +1,121 @@
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         VERIFICADOR DE TRIÂNGULO     ║");
+        System.out.println("╚═════════════════════════════════════╝");
+        
+        // Solicitar os três lados do triângulo
+        float lado1, lado2, lado3;
+        
+        do {
+            System.out.print("Digite o primeiro lado (maior que zero): ");
+            lado1 = teclado.nextFloat();
+            if (lado1 <= 0) {
+                System.out.println("Erro! O valor deve ser maior que zero.");
+            }
+        } while (lado1 <= 0);
+        
+        do {
+            System.out.print("Digite o segundo lado (maior que zero): ");
+            lado2 = teclado.nextFloat();
+            if (lado2 <= 0) {
+                System.out.println("Erro! O valor deve ser maior que zero.");
+            }
+        } while (lado2 <= 0);
+        
+        do {
+            System.out.print("Digite o terceiro lado (maior que zero): ");
+            lado3 = teclado.nextFloat();
+            if (lado3 <= 0) {
+                System.out.println("Erro! O valor deve ser maior que zero.");
+            }
+        } while (lado3 <= 0);
+        
+        // Verificar se forma um triângulo
+        if (formaTriangulo(lado1, lado2, lado3)) {
+            System.out.println("\n✅ Os lados FORMAM um triângulo!");
+            
+            // Determinar e mostrar o tipo de triângulo
+            String tipo = determinarTipoTriangulo(lado1, lado2, lado3);
+            System.out.println("📐 Tipo do triângulo: " + tipo);
+            
+        } else {
+            System.out.println("\n❌ Os lados NÃO FORMAM um triângulo!");
+            System.out.println("Lembre-se: cada lado deve ser menor que a soma dos outros dois.");
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    /**
+     * Função para verificar se os lados formam um triângulo
+     * Regra: cada lado deve ser menor que a soma dos outros dois
+     */
+    public static boolean formaTriangulo(float a, float b, float c) {
+        return (a < b + c) && (b < a + c) && (c < a + b);
+    }
+    
+    /**
+     * Função para determinar o tipo de triângulo
+     */
+    public static String determinarTipoTriangulo(float a, float b, float c) {
+        if (a == b && b == c) {
+            return "EQUILÁTERO (três lados iguais)";
+        } else if (a == b || a == c || b == c) {
+            return "ISÓSCELES (dois lados iguais)";
+        } else {
+            return "ESCALENO (três lados diferentes)";
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja verificar outro triângulo? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
