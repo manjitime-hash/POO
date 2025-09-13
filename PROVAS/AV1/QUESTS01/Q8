@@ -21,61 +21,89 @@ public class Main {
         
         System.out.println("╔══════════════════════════════════════╗");
         System.out.println("║         PLANILHA DE NOTAS            ║");
-        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println("║      (3 notas por aluno)             ║");
+        System.out.println("╚════════════════════════════════════╝");
         
         // Solicitar quantidade de alunos
         System.out.print("Digite a quantidade de alunos: ");
         int qntdAlunos = teclado.nextInt();
         
-        // Solicitar quantidade de notas
-        System.out.print("Digite a quantidade de notas por aluno: ");
-        int qntdNotas = teclado.nextInt();
-        
-        // Validar entradas
-        if(qntdAlunos <= 0 || qntdNotas <= 0) {
-            System.out.println("Erro! A quantidade de alunos e notas deve ser maior que zero.");
+        // Validar entrada
+        if(qntdAlunos <= 0) {
+            System.out.println("Erro! A quantidade de alunos deve ser maior que zero.");
             return perguntarSeDesejaContinuar();
         }
         
+        // Quantidade fixa de notas (3 conforme a questão)
+        int qntdNotas = 3;
+        
         float[][] planilhaNotas = new float[qntdAlunos][qntdNotas];
         
-        // Preencher a planilha de notas
+        // Preencher as notas AV1 e AV2 para cada aluno
         for(int aluno = 0; aluno < qntdAlunos; aluno++) {
             limparTela();
             System.out.println("Notas do Aluno " + (aluno + 1) + ":");
             
-            for(int nota = 0; nota < qntdNotas; nota++ ) {
-                System.out.printf("Av%d: ", nota + 1);    
-                planilhaNotas[aluno][nota] = teclado.nextFloat();
+            System.out.print("AV1: ");
+            planilhaNotas[aluno][0] = teclado.nextFloat();
+            
+            System.out.print("AV2: ");
+            planilhaNotas[aluno][1] = teclado.nextFloat();
+            
+            // Calcular média inicial
+            float mediaInicial = (planilhaNotas[aluno][0] + planilhaNotas[aluno][1]) / 2;
+            
+            // Verificar se precisa da AV3
+            if(mediaInicial < 6.0) {
+                System.out.print("AV3 (média inicial " + mediaInicial + " < 6.0): ");
+                planilhaNotas[aluno][2] = teclado.nextFloat();
+                
+                // Substituir a menor nota entre AV1 e AV2 pela AV3
+                if(planilhaNotas[aluno][0] < planilhaNotas[aluno][1]) {
+                    planilhaNotas[aluno][0] = planilhaNotas[aluno][2];
+                } else {
+                    planilhaNotas[aluno][1] = planilhaNotas[aluno][2];
+                }
+            } else {
+                planilhaNotas[aluno][2] = 0; // AV3 não utilizada
+                System.out.println("AV3: Não necessária (média inicial: " + mediaInicial + ")");
             }
         }
         
-        // Exibir a planilha de notas
+        // Exibir os resultados finais
         limparTela();
         System.out.println("╔══════════════════════════════════════╗");
-        System.out.println("║         RESULTADO - NOTAS            ║");
+        System.out.println("║         RESULTADO FINAL              ║");
         System.out.println("╚══════════════════════════════════════╝");
         
-        // Cabeçalho com as avaliações
-        System.out.print("Aluno\t");
-        for(int nota = 0; nota < qntdNotas; nota++) {
-            System.out.printf("Av%d\t", nota + 1);
-        }
-        System.out.println("Média");
+        System.out.println("Aluno\tAV1\tAV2\tAV3\tMédia\tSituação");
+        System.out.println("══════════════════════════════════════════");
         
-        // Linhas com as notas de cada aluno
         for(int aluno = 0; aluno < qntdAlunos; aluno++) {
-            System.out.printf("%d\t", aluno + 1);
-            float soma = 0;
+            float nota1 = planilhaNotas[aluno][0];
+            float nota2 = planilhaNotas[aluno][1];
+            float nota3 = planilhaNotas[aluno][2];
+            float mediaFinal = (nota1 + nota2) / 2;
             
-            for(int nota = 0; nota < qntdNotas; nota++) {
-                System.out.printf("%.1f\t", planilhaNotas[aluno][nota]);
-                soma += planilhaNotas[aluno][nota];
+            System.out.printf("%d\t", aluno + 1);
+            System.out.printf("%.1f\t%.1f\t", nota1, nota2);
+            
+            // Mostrar AV3 apenas se foi utilizada
+            if(nota3 > 0) {
+                System.out.printf("%.1f\t", nota3);
+            } else {
+                System.out.print("-\t");
             }
             
-            // Calcular e exibir a média
-            float media = soma / qntdNotas;
-            System.out.printf("%.1f%n", media);
+            System.out.printf("%.1f\t", mediaFinal);
+            
+            // Verificar situação
+            if(mediaFinal >= 6.0) {
+                System.out.print("APROVADO");
+            } else {
+                System.out.print("REPROVADO");
+            }
+            System.out.println();
         }
         
         return perguntarSeDesejaContinuar();
