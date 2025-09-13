@@ -1,0 +1,117 @@
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("========================================\n" +
+                         "    SEPARADOR DE NÚMEROS PARES E ÍMPARES\n" +
+                         "========================================");
+        
+        // Solicitar a quantidade de números
+        int quantidade;
+        do {
+            System.out.print("Digite a quantidade de números: ");
+            quantidade = teclado.nextInt();
+            if (quantidade <= 0) {
+                System.out.println("Erro! A quantidade deve ser maior que zero.");
+            }
+        } while (quantidade <= 0);
+        
+        // Vetor principal com a quantidade especificada
+        int[] numeros = new int[quantidade];
+        int par = 0;
+        int impar = 0;
+        
+        for (int i = 0; i < quantidade; i++) {
+            limparTela();
+            System.out.printf("Número %d: ", i + 1);
+            int temp = teclado.nextInt();
+            
+            // Separar pares no início e ímpares no final do vetor
+            if (temp % 2 == 0) {
+                numeros[par] = temp;
+                par++;
+            } else {
+                numeros[quantidade - 1 - impar] = temp; // Coloca os ímpares no final
+                impar++;
+            }
+        }
+        
+        // Exibir resultados
+        limparTela();
+        System.out.println("========================================\n" +
+                         "            RESULTADOS\n" +
+                         "========================================");
+        
+        // Todos os números
+        System.out.println("Todos os números digitados:");
+        for (int i = 0; i < quantidade; i++) {
+            System.out.print(numeros[i] + " ");
+        }
+        System.out.println("\n");
+        
+        // Números pares (primeiros 'par' elementos)
+        System.out.println("Números pares (" + par + " números):");
+        for (int i = 0; i < par; i++) {
+            System.out.print(numeros[i] + " ");
+        }
+        System.out.println("\n");
+        
+        // Números ímpares (últimos 'impar' elementos)
+        System.out.println("Números ímpares (" + impar + " números):");
+        for (int i = quantidade - 1; i > quantidade - 1 - impar; i--) {
+            System.out.print(numeros[i] + " ");
+        }
+        System.out.println();
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
