@@ -1,0 +1,142 @@
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║      INTERCALAÇÃO DE VETORES         ║");
+        System.out.println("║    (10 elementos cada, sem repetidos)║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int tamanho = 10;
+        int[] vetor1 = new int[tamanho];
+        int[] vetor2 = new int[tamanho];
+        
+        // Ler o primeiro vetor
+        System.out.println("\nPRIMEIRO VETOR:");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor1[i] = teclado.nextInt();
+        }
+        
+        // Ler o segundo vetor
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║      INTERCALAÇÃO DE VETORES         ║");
+        System.out.println("║    (10 elementos cada, sem repetidos)║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println("\nSEGUNDO VETOR:");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor2[i] = teclado.nextInt();
+        }
+        
+        // Criar vetor intercalado sem valores repetidos
+        int[] vetor3 = new int[tamanho * 2];
+        int posicao = 0;
+        
+        // Adicionar elementos do primeiro vetor (sem repetições)
+        for (int i = 0; i < tamanho; i++) {
+            if (!contem(vetor3, posicao, vetor1[i])) {
+                vetor3[posicao++] = vetor1[i];
+            }
+        }
+        
+        // Adicionar elementos do segundo vetor (sem repetições)
+        for (int i = 0; i < tamanho; i++) {
+            if (!contem(vetor3, posicao, vetor2[i])) {
+                vetor3[posicao++] = vetor2[i];
+            }
+        }
+        
+        // Criar um novo vetor com o tamanho exato (sem zeros no final)
+        int[] vetorFinal = new int[posicao];
+        for (int i = 0; i < posicao; i++) {
+            vetorFinal[i] = vetor3[i];
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           RESULTADOS                 ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Primeiro vetor:  ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor1[i] + " ");
+        }
+        
+        System.out.print("\nSegundo vetor:   ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor2[i] + " ");
+        }
+        
+        System.out.print("\nVetor intercalado (sem repetidos): ");
+        for (int i = 0; i < vetorFinal.length; i++) {
+            System.out.print(vetorFinal[i] + " ");
+        }
+        
+        System.out.println("\nTamanho do vetor final: " + vetorFinal.length + " elementos");
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    // Método auxiliar para verificar se um valor já existe no vetor
+    public static boolean contem(int[] vetor, int tamanho, int valor) {
+        for (int i = 0; i < tamanho; i++) {
+            if (vetor[i] == valor) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\n\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
