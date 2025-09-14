@@ -1,0 +1,1956 @@
+\\TODAS AS QUESTOES :
+
+
+\\ questão 1
+
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        System.out.print("Quantos números deseja analisar? ");
+        int tamanho = teclado.nextInt();
+        
+        if(tamanho <= 0) {
+            limparTela();
+            System.out.println("Erro!! Impossível analisar zero ou números negativos!");
+            // Em vez de System.exit(0), vamos perguntar se deseja continuar
+            return perguntarSeDesejaContinuar();
+        }
+        
+        double[] resultados = encontrarMaiorMenor(tamanho);
+        
+        limparTela();
+        
+        System.out.printf("Maior número: %15.2f%n", resultados[0]);
+        System.out.printf("Menor número: %15.2f%n", resultados[1]);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static double[] encontrarMaiorMenor(int tamanho) {
+        double maior = Double.NEGATIVE_INFINITY;
+        double menor = Double.POSITIVE_INFINITY;
+        
+        for (int i = 0; i < tamanho; i++) {
+            limparTela();
+            
+            System.out.print("Digite o número " + (i + 1) + ": ");
+            double numero = teclado.nextDouble();
+            
+            if (numero > maior) {
+                maior = numero;
+            }
+            if (numero < menor) {
+                menor = numero;
+            }
+        }
+        
+        return new double[]{maior, menor};
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();\\tudo lido como maiusculo 
+            
+            // Limpar o buffer do teclado
+            teclado.nextLine();
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                limparTela();
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                limparTela() ;
+                return false;
+            } else {
+                System.out.print("Resposta inválida!! Digite novamente.");
+                limparTela() ;
+                
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+\\ QUESTAO 02 
+
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        System.out.print("Quantos números deseja analisar? ");
+        int tamanho = teclado.nextInt();
+        
+        if(tamanho <= 0) {
+            limparTela();
+            System.out.println("Erro!! Impossível analisar zero ou números negativos!");
+            // Em vez de System.exit(0), vamos perguntar se deseja continuar
+            return perguntarSeDesejaContinuar();
+        }
+        
+        double[] resultados = encontrarMaiorMenor(tamanho);
+        
+        limparTela();
+        
+        System.out.printf("Maior número: %15.2f%n", resultados[0]);
+        System.out.printf("Menor número: %15.2f%n", resultados[1]);
+        System.out.printf("   Somatório: %15.2f%n", resultados[2]);
+        System.out.printf("       Media: %15.2f%n", resultados[2] / tamanho);
+
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static double[] encontrarMaiorMenor(int tamanho) {
+        double maior = Double.NEGATIVE_INFINITY;
+        double menor = Double.POSITIVE_INFINITY;
+        double soma=0 ;
+        
+        for (int i = 0; i < tamanho; i++) {
+            limparTela();
+            
+            System.out.print("Digite o número " + (i + 1) + ": ");
+            double numero = teclado.nextDouble();
+            soma=soma+numero ;
+            if (numero > maior) {
+                maior = numero;
+            }
+            if (numero < menor) {
+                menor = numero;
+            }
+        }
+        
+        return new double[]{maior, menor,soma};
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            
+            // Limpar o buffer do teclado
+            teclado.nextLine();
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                limparTela();
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                limparTela() ;
+                return false;
+            } else {
+                System.out.print("Resposta inválida!! Digite novamente.");
+                limparTela() ;
+                
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 03 
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        System.out.print("Qual número deseja verificar se é primo? ");
+        int num = teclado.nextInt();
+        teclado.nextLine(); // Limpar buffer
+        
+        if (num < 2) {
+            jugamento(num);
+        } else {
+            verificarPrimo(num);
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static void verificarPrimo(int num) {
+        int cnum = 1;
+        int cont = 1;
+        
+        System.out.print("Esse número é divisível por:\n[");
+        do {
+            if (num % cont == 0) {
+                cnum++;
+                System.out.print(cont + ",");
+            }
+            cont++;
+        } while (cont < num);
+        
+        System.out.print(num + "]");
+        
+        if (cnum == 2) {
+            System.out.println("\nLogo é primo");
+        } else {
+            System.out.println("\nLogo não é primo");
+        }
+    }
+    
+    public static void jugamento(int n) {
+        if (n == 0) {
+            System.out.println("Não é primo, pois 0 é um dividendo universal");
+        } else if (n == 1) {
+            System.out.println("1 não é primo por definição");
+        } else {
+            System.out.println(n + " por definição não é primo");
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            
+            System.out.print("\nDeseja verificar mais números? (y/n): ");
+            resposta = teclado.next().toUpperCase(); // tudo lido como maiusculo 
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("Y")) {
+                limparTela();
+                return true;
+            } else if (resposta.equals("N")) {
+                return false;
+            } else {
+                System.out.println("Entrada inválida, por favor usar y ou n");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\ QUESTOA 04
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        System.out.print("Digite o limite inferior do intervalo: ");
+        double limiteInferior = teclado.nextDouble();
+        
+        System.out.print("Digite o limite superior do intervalo: ");
+        double limiteSuperior = teclado.nextDouble();
+        
+        if(limiteInferior >= limiteSuperior) {
+            limparTela();
+            System.out.println("Erro! O limite inferior deve ser menor que o limite superior.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        System.out.print("Digite o número a ser verificado: ");
+        double numero = teclado.nextDouble();
+        
+        boolean resultado = verificarNumeroNoIntervalo(limiteInferior, limiteSuperior, numero);
+        exibirResultado(limiteInferior, limiteSuperior, numero, resultado);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean verificarNumeroNoIntervalo(double limiteInferior, double limiteSuperior, double numero) {
+        return (numero >= limiteInferior && numero <= limiteSuperior);
+    }
+    
+    public static void exibirResultado(double limiteInferior, double limiteSuperior, double numero, boolean resultado) {
+        limparTela();
+        System.out.printf("Intervalo definido de %.2f até %.2f %n%n", limiteInferior, limiteSuperior);
+        
+        if (resultado) {
+            System.out.printf("O número %.2f está DENTRO do intervalo.%n", numero);
+        } else {
+            System.out.printf("O número %.2f está FORA do intervalo.%n", numero);
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                limparTela();
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 05 
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela(); // Limpa a tela no início de cada execução
+        
+        int numero;
+        boolean entradaValida = false;
+        
+        do {
+            System.out.print("Digite um número entre 12 e 20: ");
+            numero = teclado.nextInt();
+            
+            if (numero >= 12 && numero <= 20) {
+                entradaValida = true;
+            } else {
+                limparTela(); // Limpa a tela após entrada inválida
+                System.out.println("Entrada inválida!");
+                // Limpar o buffer do teclado
+                teclado.nextLine();
+            }
+        } while (!entradaValida);
+        
+        limparTela(); // Limpa a tela antes de mostrar o resultado
+        System.out.println("Número digitado: " + numero);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 06
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║        CONVERSOR DE TEMPERATURA      ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Primeiro pedir a escala de origem
+        System.out.println("\nEscalas disponíveis:");
+        System.out.println("C - Celsius");
+        System.out.println("F - Fahrenheit");
+        System.out.println("K - Kelvin");
+        
+        String escalaAtual = lerEscala("Digite a escala de ORIGEM (C/F/K): ");
+        double temperatura = lerTemperatura(escalaAtual);
+        
+        String escalaDestino = lerEscala("Digite a escala de DESTINO (C/F/K): ");
+        
+        // Se as escalas forem iguais
+        if (escalaAtual.equals(escalaDestino)) {
+            System.out.println("As escalas são iguais. Não há conversão necessária.");
+            System.out.println("Temperatura: " + temperatura + "°" + escalaAtual);
+            return perguntarSeDesejaContinuar();
+        }
+        
+        // Realizar a conversão
+        double resultado = converterTemperatura(temperatura, escalaAtual, escalaDestino);
+        
+        // Exibir o resultado
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           RESULTADO DA CONVERSÃO     ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.printf("  %.2f°%s = %.2f°%s%n", temperatura, escalaAtual, resultado, escalaDestino);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    // Função para ler e validar uma escala
+    public static String lerEscala(String mensagem) {
+        String escala;
+        do {
+            System.out.print(mensagem);
+            escala = teclado.next().toUpperCase();
+            
+            if (escala.equals("C") || escala.equals("F") || escala.equals("K")) {
+                return escala;
+            } else {
+                System.out.println("Escala inválida! Use apenas C, F ou K.");
+                teclado.nextLine(); // Limpar buffer
+            }
+        } while (true);
+    }
+    
+    // Função para ler e validar uma temperatura de acordo com a escala
+    public static double lerTemperatura(String escala) {
+        double temperatura;
+        do {
+            System.out.print("Digite a temperatura em " + escala + ": ");
+            
+            if (teclado.hasNextDouble()) {
+                temperatura = teclado.nextDouble();
+                
+                // Validar de acordo com a escala
+                if (escala.equals("K") && temperatura < 0) {
+                    System.out.println("Erro: A temperatura em Kelvin não pode ser negativa!");
+                    System.out.println("O zero absoluto é 0K (-273.15°C)");
+                } else if (escala.equals("C") && temperatura < -273.15) {
+                    System.out.println("Aviso: Esta temperatura está abaixo do zero absoluto (-273.15°C)!");
+                    System.out.println("A conversão será realizada, mas é fisicamente impossível.");
+                    return temperatura;
+                } else if (escala.equals("F") && temperatura < -459.67) {
+                    System.out.println("Aviso: Esta temperatura está abaixo do zero absoluto (-459.67°F)!");
+                    System.out.println("A conversão será realizada, mas é fisicamente impossível.");
+                    return temperatura;
+                } else {
+                    return temperatura;
+                }
+            } else {
+                System.out.println("Valor inválido! Digite um número.");
+                teclado.next(); // Limpar o valor inválido
+            }
+        } while (true);
+    }
+    
+    public static double converterTemperatura(double temp, String origem, String destino) {
+        // Converter para Celsius primeiro (como ponto intermediário)
+        double celsius;
+        
+        switch (origem) {
+            case "C":
+                celsius = temp;
+                break;
+            case "F":
+                celsius = (temp - 32) / 1.8;
+                break;
+            case "K":
+                celsius = temp - 273.15;
+                break;
+            default:
+                celsius = temp;
+        }
+        
+        // Converter de Celsius para a escala de destino
+        switch (destino) {
+            case "C":
+                return celsius;
+            case "F":
+                return celsius * 1.8 + 32;
+            case "K":
+                return celsius + 273.15;
+            default:
+                return celsius;
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja converter outra temperatura? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 07
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+       
+        
+        // Variáveis para armazenar os dados
+        int quantidade = 0;
+        double soma = 0;
+        int menor = Integer.MAX_VALUE;
+        int maior = Integer.MIN_VALUE;
+        
+        // Ler idades até que seja digitado 0
+        while (true) {
+             System.out.print("╔════════════════════════════════════╗\n" +
+                        "║        ANÁLISE DE IDADES            ║\n" +
+                        "╚════════════════════════════════════╝\n" +
+                        "Digite a idade (0 para encerrar a leitura):\n"+
+                        "Idade da pessoa " + (quantidade + 1) + ": ");
+            int idade = teclado.nextInt();
+            limparTela();
+            
+            // Verificar se é o código de parada
+            if (idade == 0) {
+                break;
+            }
+            
+            // Validar se a idade é positiva
+            if (idade < 0) {
+                System.out.println("Idade inválida! Digite uma idade positiva ou 0 para encerrar.");
+                continue;
+            }
+            
+            // Atualizar estatísticas
+            quantidade++;
+            soma += idade;
+            
+            if (idade < menor) {
+                menor = idade;
+            }
+            
+            if (idade > maior) {
+                maior = idade;
+            }
+        }
+        
+        // Verificar se pelo menos uma idade foi informada
+        if (quantidade == 0) {
+            limparTela();
+            System.out.println("Nenhuma idade foi informada.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        // Calcular a média
+        double media = soma / quantidade;
+        
+        // Exibir resultados com um único print
+        limparTela();
+        System.out.print("╔═════════════════════════════════════╗\n" +
+                        "║           RESULTADOS                 ║\n" +
+                        "╚═════════════════════════════════════╝\n" +
+                        "a. Número de pessoas: " + quantidade + "\n" +
+                        "b. Idade média do grupo: " + String.format("%.2f", media) + " anos\n" +
+                        "c. Menor idade: " + menor + " anos\n" +
+                        "   Maior idade: " + maior + " anos\n");
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 08 
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         PLANILHA DE NOTAS            ║");
+        System.out.println("║      (3 notas por aluno)             ║");
+        System.out.println("╚════════════════════════════════════╝");
+        
+        // Solicitar quantidade de alunos
+        System.out.print("Digite a quantidade de alunos: ");
+        int qntdAlunos = teclado.nextInt();
+        
+        // Validar entrada
+        if(qntdAlunos <= 0) {
+            System.out.println("Erro! A quantidade de alunos deve ser maior que zero.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        // Quantidade fixa de notas (3 conforme a questão)
+        int qntdNotas = 3;
+        
+        float[][] planilhaNotas = new float[qntdAlunos][qntdNotas];
+        
+        // Preencher as notas AV1 e AV2 para cada aluno
+        for(int aluno = 0; aluno < qntdAlunos; aluno++) {
+            limparTela();
+            System.out.println("Notas do Aluno " + (aluno + 1) + ":");
+            
+            System.out.print("AV1: ");
+            planilhaNotas[aluno][0] = teclado.nextFloat();
+            
+            System.out.print("AV2: ");
+            planilhaNotas[aluno][1] = teclado.nextFloat();
+            
+            // Calcular média inicial
+            float mediaInicial = (planilhaNotas[aluno][0] + planilhaNotas[aluno][1]) / 2;
+            
+            // Verificar se precisa da AV3
+            if(mediaInicial < 6.0) {
+                System.out.print("AV3 (média inicial " + mediaInicial + " < 6.0): ");
+                planilhaNotas[aluno][2] = teclado.nextFloat();
+                
+                // Substituir a menor nota entre AV1 e AV2 pela AV3
+                if(planilhaNotas[aluno][0] < planilhaNotas[aluno][1]) {
+                    planilhaNotas[aluno][0] = planilhaNotas[aluno][2];
+                } else {
+                    planilhaNotas[aluno][1] = planilhaNotas[aluno][2];
+                }
+            } else {
+                planilhaNotas[aluno][2] = 0; // AV3 não utilizada
+                System.out.println("AV3: Não necessária (média inicial: " + mediaInicial + ")");
+            }
+        }
+        
+        // Exibir os resultados finais
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         RESULTADO FINAL              ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.println("Aluno\tAV1\tAV2\tAV3\tMédia\tSituação");
+        System.out.println("══════════════════════════════════════════");
+        
+        for(int aluno = 0; aluno < qntdAlunos; aluno++) {
+            float nota1 = planilhaNotas[aluno][0];
+            float nota2 = planilhaNotas[aluno][1];
+            float nota3 = planilhaNotas[aluno][2];
+            float mediaFinal = (nota1 + nota2) / 2;
+            
+            System.out.printf("%d\t", aluno + 1);
+            System.out.printf("%.1f\t%.1f\t", nota1, nota2);
+            
+            // Mostrar AV3 apenas se foi utilizada
+            if(nota3 > 0) {
+                System.out.printf("%.1f\t", nota3);
+            } else {
+                System.out.print("-\t");
+            }
+            
+            System.out.printf("%.1f\t", mediaFinal);
+            
+            // Verificar situação
+            if(mediaFinal >= 6.0) {
+                System.out.print("APROVADO");
+            } else {
+                System.out.print("REPROVADO");
+            }
+            System.out.println();
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 09 
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         VERIFICADOR DE TRIÂNGULO     ║");
+        System.out.println("╚═════════════════════════════════════╝");
+        
+        // Solicitar os três lados do triângulo
+        float lado1, lado2, lado3;
+        
+        do {
+            System.out.print("Digite o primeiro lado (maior que zero): ");
+            lado1 = teclado.nextFloat();
+            if (lado1 <= 0) {
+                System.out.println("Erro! O valor deve ser maior que zero.");
+            }
+        } while (lado1 <= 0);
+        
+        do {
+            System.out.print("Digite o segundo lado (maior que zero): ");
+            lado2 = teclado.nextFloat();
+            if (lado2 <= 0) {
+                System.out.println("Erro! O valor deve ser maior que zero.");
+            }
+        } while (lado2 <= 0);
+        
+        do {
+            System.out.print("Digite o terceiro lado (maior que zero): ");
+            lado3 = teclado.nextFloat();
+            if (lado3 <= 0) {
+                System.out.println("Erro! O valor deve ser maior que zero.");
+            }
+        } while (lado3 <= 0);
+        
+        // Verificar se forma um triângulo
+        if (formaTriangulo(lado1, lado2, lado3)) {
+            System.out.println("\n✅ Os lados FORMAM um triângulo!");
+            
+            // Determinar e mostrar o tipo de triângulo
+            String tipo = determinarTipoTriangulo(lado1, lado2, lado3);
+            System.out.println("📐 Tipo do triângulo: " + tipo);
+            
+        } else {
+            System.out.println("\n❌ Os lados NÃO FORMAM um triângulo!");
+            System.out.println("Lembre-se: cada lado deve ser menor que a soma dos outros dois.");
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    /**
+     * Função para verificar se os lados formam um triângulo
+     * Regra: cada lado deve ser menor que a soma dos outros dois
+     */
+    public static boolean formaTriangulo(float a, float b, float c) {
+        return (a < b + c) && (b < a + c) && (c < a + b);
+    }
+    
+    /**
+     * Função para determinar o tipo de triângulo
+     */
+    public static String determinarTipoTriangulo(float a, float b, float c) {
+        if (a == b && b == c) {
+            return "EQUILÁTERO (três lados iguais)";
+        } else if (a == b || a == c || b == c) {
+            return "ISÓSCELES (dois lados iguais)";
+        } else {
+            return "ESCALENO (três lados diferentes)";
+        }
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja verificar outro triângulo? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 10
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("========================================\n" +
+                         "    SEPARADOR DE NÚMEROS PARES E ÍMPARES\n" +
+                         "========================================");
+        
+        // Solicitar a quantidade de números
+        int quantidade;
+        do {
+            System.out.print("Digite a quantidade de números: ");
+            quantidade = teclado.nextInt();
+            if (quantidade <= 0) {
+                System.out.println("Erro! A quantidade deve ser maior que zero.");
+            }
+        } while (quantidade <= 0);
+        
+        // Vetor principal com a quantidade especificada
+        int[] numeros = new int[quantidade];
+        int par = 0;
+        int impar = 0;
+        
+        for (int i = 0; i < quantidade; i++) {
+            limparTela();
+            System.out.printf("Número %d: ", i + 1);
+            int temp = teclado.nextInt();
+            
+            // Separar pares no início e ímpares no final do vetor
+            if (temp % 2 == 0) {
+                numeros[par] = temp;
+                par++;
+            } else {
+                numeros[quantidade - 1 - impar] = temp; // Coloca os ímpares no final
+                impar++;
+            }
+        }
+        
+        // Exibir resultados
+        limparTela();
+        System.out.println("========================================\n" +
+                         "            RESULTADOS\n" +
+                         "========================================");
+        
+        // Todos os números
+        System.out.println("Todos os números digitados:");
+        for (int i = 0; i < quantidade; i++) {
+            System.out.print(numeros[i] + " ");
+        }
+        System.out.println("\n");
+        
+        // Números pares (primeiros 'par' elementos)
+        System.out.println("Números pares (" + par + " números):");
+        for (int i = 0; i < par; i++) {
+            System.out.print(numeros[i] + " ");
+        }
+        System.out.println("\n");
+        
+        // Números ímpares (últimos 'impar' elementos)
+        System.out.println("Números ímpares (" + impar + " números):");
+        for (int i = quantidade - 1; i > quantidade - 1 - impar; i--) {
+            System.out.print(numeros[i] + " ");
+        }
+        System.out.println();
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 11
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║          PLANILHA DE NOTAS           ║");
+        System.out.println("║      (4 notas por aluno)             ║");
+        System.out.println("╚════════════════════════════════════╝");
+        
+        // Solicitar quantidade de alunos
+        System.out.print("Digite a quantidade de alunos: ");
+        int qntdAlunos = teclado.nextInt();
+        
+        // Validar entrada
+        if(qntdAlunos <= 0) {
+            System.out.println("Erro! A quantidade de alunos deve ser maior que zero.");
+            return perguntarSeDesejaContinuar();
+        }
+        
+        int qntdNotas = 4;
+        float[][] notasAlunos = new float[qntdAlunos][qntdNotas];
+        float[] medias = new float[qntdAlunos];
+        int aprovados = 0;
+
+        // Coletar as 4 notas e calcular média para cada aluno
+        for(int i = 0; i < qntdAlunos; i++) {
+            limparTela();
+            System.out.println("Notas do Aluno " + (i + 1) + ":");
+            
+            float soma = 0;
+            for(int j = 0; j < qntdNotas; j++) {
+                System.out.print("Nota " + (j + 1) + ": ");
+                notasAlunos[i][j] = teclado.nextFloat();
+                soma += notasAlunos[i][j];
+            }
+            
+            // Calcular média imediatamente após coletar as notas
+            medias[i] = soma / qntdNotas;
+            
+            // Contar aprovações
+            if(medias[i] >= 7.0) {
+                aprovados++;
+            }
+        }
+
+        // Exibir resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║          RESULTADO FINAL             ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Exibir notas e médias
+        System.out.println("Aluno\tNota1\tNota2\tNota3\tNota4\tMédia");
+        System.out.println("══════════════════════════════════════════════");
+        
+        for(int i = 0; i < qntdAlunos; i++) {
+            System.out.printf("%d\t", i + 1);
+            for(int j = 0; j < qntdNotas; j++) {
+                System.out.printf("%.1f\t", notasAlunos[i][j]);
+            }
+            System.out.printf("%.1f\n", medias[i]);
+        }
+        
+        // Exibir número de aprovados
+        System.out.println("\nNúmero de alunos com média >= 7.0: " + aprovados);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 12
+import java.util.Scanner;
+
+public class Main{
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║       OPERAÇÕES COM VETOR            ║");
+        System.out.println("║       5 NÚMEROS INTEIROS             ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int[] numeros = new int[5];
+        
+        // Ler os 5 números
+        for (int i = 0; i < 5; i++) {
+            System.out.print("Digite o " + (i + 1) + "º número inteiro: ");
+            numeros[i] = teclado.nextInt();
+        }
+        
+        // Calcular a soma
+        int soma = 0;
+        for (int numero : numeros) {// for-each  simplificado
+            soma += numero;
+        }
+        
+        // Calcular a multiplicação
+        long multiplicacao = 1;
+        for (int numero : numeros) {
+            multiplicacao *= numero;
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║             RESULTADOS               ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Números digitados: ");
+        for (int i = 0; i < 5; i++) {
+            System.out.print(numeros[i]);
+            if (i < 4) System.out.print(", ");
+        }
+        
+        System.out.println("\nSoma dos números: " + soma);
+        System.out.println("Multiplicação dos números: " + multiplicacao);
+        System.out.println("══════════════════════════════════════");
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 13
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║       IDADE E ALTURA - 5 PESSOAS     ║");
+        System.out.println("║        (Ordem Inversa)               ║");
+        System.out.println("╚════════════════════════════════════╝");
+        
+        int[] idades = new int[5];
+        double[] alturas = new double[5];
+        
+        // Ler os dados das 5 pessoas
+        for (int i = 0; i < 5; i++) {
+            System.out.println("\nPessoa " + (i + 1) + ":");
+            
+            System.out.print("Idade: ");
+            idades[i] = teclado.nextInt();
+            
+            System.out.print("Altura (em metros): ");
+            alturas[i] = teclado.nextDouble();
+            
+            // Limpar a tela após cadastrar cada pessoa
+            if (i < 4) { // Não limpa após a última pessoa
+                limparTela();
+                System.out.println("╔══════════════════════════════════════╗");
+                System.out.println("║       IDADE E ALTURA - 5 PESSOAS     ║");
+                System.out.println("║        (Ordem Inversa)               ║");
+                System.out.println("╚══════════════════════════════════════╝");
+            }
+        }
+        
+        // Exibir os resultados na ordem inversa
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║        RESULTADOS - ORDEM INVERSA    ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.println("Ordem\tIdade\tAltura");
+        System.out.println("══════════════════════════");
+        
+        for (int i = 4; i >= 0; i--) {
+            System.out.printf("%dº\t%d\t%.2fm\n", (5 - i), idades[i], alturas[i]);
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 14 
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║      INTERCALAÇÃO DE VETORES         ║");
+        System.out.println("║    (10 elementos cada, 20 no total)  ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int tamanho = 10;
+        int[] vetor1 = new int[tamanho];
+        int[] vetor2 = new int[tamanho];
+        int[] vetor3 = new int[tamanho * 2];
+        
+        // Ler o primeiro vetor
+        for (int i = 0; i < tamanho; i++) {
+            System.out.println("\nPRIMEIRO VETOR:");
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor1[i] = teclado.nextInt();
+            limparTela() ;
+        }
+        
+        // Ler o segundo vetor
+        for (int i = 0; i < tamanho; i++) {
+            System.out.println("\nSEGUNDO VETOR:");
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor2[i] = teclado.nextInt();
+            limparTela() ;
+        }
+        
+        // Intercalar os vetores
+        for (int i = 0; i < tamanho; i++) {
+            vetor3[i * 2] = vetor1[i];     // Posições pares (0, 2, 4, ...)
+            vetor3[i * 2 + 1] = vetor2[i]; // Posições ímpares (1, 3, 5, ...)
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           RESULTADOS                 ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Primeiro vetor:  ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor1[i] + " ");
+        }
+        
+        System.out.print("\nSegundo vetor:   ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor2[i] + " ");
+        }
+        
+        System.out.print("\nVetor intercalado: ");
+        for (int i = 0; i < tamanho * 2; i++) {
+            System.out.print(vetor3[i] + " ");
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\n\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 15
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║      INTERCALAÇÃO DE VETORES         ║");
+        System.out.println("║    (10 elementos cada, sem repetidos)║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int tamanho = 10;
+        int[] vetor1 = new int[tamanho];
+        int[] vetor2 = new int[tamanho];
+        
+        // Ler o primeiro vetor
+        System.out.println("\nPRIMEIRO VETOR:");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor1[i] = teclado.nextInt();
+        }
+        
+        // Ler o segundo vetor
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║      INTERCALAÇÃO DE VETORES         ║");
+        System.out.println("║    (10 elementos cada, sem repetidos)║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println("\nSEGUNDO VETOR:");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor2[i] = teclado.nextInt();
+        }
+        
+        // Criar vetor intercalado sem valores repetidos
+        int[] vetor3 = new int[tamanho * 2];
+        int posicao = 0;
+        
+        // Adicionar elementos do primeiro vetor (sem repetições)
+        for (int i = 0; i < tamanho; i++) {
+            if (!contem(vetor3, posicao, vetor1[i])) {
+                vetor3[posicao++] = vetor1[i];
+            }
+        }
+        
+        // Adicionar elementos do segundo vetor (sem repetições)
+        for (int i = 0; i < tamanho; i++) {
+            if (!contem(vetor3, posicao, vetor2[i])) {
+                vetor3[posicao++] = vetor2[i];
+            }
+        }
+        
+        // Criar um novo vetor com o tamanho exato (sem zeros no final)
+        int[] vetorFinal = new int[posicao];
+        for (int i = 0; i < posicao; i++) {
+            vetorFinal[i] = vetor3[i];
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           RESULTADOS                 ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Primeiro vetor:  ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor1[i] + " ");
+        }
+        
+        System.out.print("\nSegundo vetor:   ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor2[i] + " ");
+        }
+        
+        System.out.print("\nVetor intercalado (sem repetidos): ");
+        for (int i = 0; i < vetorFinal.length; i++) {
+            System.out.print(vetorFinal[i] + " ");
+        }
+        
+        System.out.println("\nTamanho do vetor final: " + vetorFinal.length + " elementos");
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    // Método auxiliar para verificar se um valor já existe no vetor
+    public static boolean contem(int[] vetor, int tamanho, int valor) {
+        for (int i = 0; i < tamanho; i++) {
+            if (vetor[i] == valor) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\n\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 16
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         ORDENAÇÃO DE VETORES         ║");
+        System.out.println("║        (10 elementos inteiros)       ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int tamanho = 10;
+        int[] vetorOriginal = new int[tamanho];
+        
+        // Ler os 10 números
+        System.out.println("\nDigite os 10 números inteiros:");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print("Número " + (i + 1) + ": ");
+            vetorOriginal[i] = teclado.nextInt();
+        }
+        
+        // Criar cópia para ordenação crescente
+        int[] vetorCrescente = Arrays.copyOf(vetorOriginal, tamanho);
+        Arrays.sort(vetorCrescente);
+        
+        // Criar vetor decrescente (inverso do crescente)
+        int[] vetorDecrescente = new int[tamanho];
+        for (int i = 0; i < tamanho; i++) {
+            vetorDecrescente[i] = vetorCrescente[tamanho - 1 - i];
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║             RESULTADOS               ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Vetor original:    ");
+        imprimirVetor(vetorOriginal);
+        
+        System.out.print("Vetor crescente:   ");
+        imprimirVetor(vetorCrescente);
+        
+        System.out.print("Vetor decrescente: ");
+        imprimirVetor(vetorDecrescente);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static void imprimirVetor(int[] vetor) {
+        for (int i = 0; i < vetor.length; i++) {
+            System.out.print(vetor[i]);
+            if (i < vetor.length - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+\\QUESTAO 17
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+    private static int[] estoqueNotas = {10, 10, 10, 10, 10}; // [100, 50, 10, 5, 2]
+    private static int[] valoresNotas = {100, 50, 10, 5, 2};
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        int repetir;
+        
+        do {
+            repetir = executarSaque();
+        } while (repetir == 1);
+        
+        System.out.println("Obrigado por utilizar nosso caixa eletrônico!");
+        teclado.close();
+    }
+    
+    public static int executarSaque() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           CAIXA ELETRÔNICO           ║");
+        System.out.println("║    Notas disponíveis: 100,50,10,5,2  ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Exibir estoque atual
+        System.out.println("\nEstoque atual de notas:");
+        System.out.println("Notas de R$100: " + estoqueNotas[0]);
+        System.out.println("Notas de R$50: " + estoqueNotas[1]);
+        System.out.println("Notas de R$10: " + estoqueNotas[2]);
+        System.out.println("Notas de R$5: " + estoqueNotas[3]);
+        System.out.println("Notas de R$2: " + estoqueNotas[4]);
+        
+        // Solicitar valor do saque
+        System.out.print("\nDigite o valor do saque (entre 10 e 2000 reais): ");
+        int valorSaque = teclado.nextInt();
+        
+        // Validar valor do saque
+        if (valorSaque < 10 || valorSaque > 2000) {
+            System.out.println("Valor inválido! O saque deve ser entre 10 e 2000 reais.");
+            return perguntarRepeticao();
+        }
+        
+        // Fazer uma cópia do estoque para simulação
+        int[] estoqueTemp = estoqueNotas.clone();
+        int[] notasUsadas = new int[5]; // Para contar quantas notas de cada valor serão usadas
+        int valorRestante = valorSaque;
+        
+        // Verificar se o valor é ímpar
+        if (valorRestante % 2 != 0) {
+            if (estoqueTemp[3] > 0) { // Tem nota de R$5?
+                valorRestante -= 5;
+                notasUsadas[3] += 1;
+                estoqueTemp[3] -= 1;
+            } else {
+                System.out.println("Não é possível realizar o saque. Não há notas de R$5 para compor valor ímpar.");
+                return perguntarRepeticao();
+            }
+        }
+        
+        // Processar as notas da maior para a menor
+        for (int i = 0; i < 4; i++) { // Notas de 100, 50, 10, 2
+            int valorNota = valoresNotas[i];
+            int index = (i == 3) ? 4 : i; // Ajuste para a nota de 2 estar no índice 4
+            
+            while (valorRestante >= valorNota && estoqueTemp[index] > 0) {
+                valorRestante -= valorNota;
+                notasUsadas[index] += 1;
+                estoqueTemp[index] -= 1;
+            }
+        }
+        
+        // Verificar se o saque foi bem-sucedido
+        if (valorRestante == 0) {
+            // Atualizar o estoque real
+            estoqueNotas = estoqueTemp;
+            
+            // Exibir resultado
+            limparTela();
+            System.out.println("╔══════════════════════════════════════╗");
+            System.out.println("║           SAQUE REALIZADO            ║");
+            System.out.println("╚══════════════════════════════════════╝");
+            
+            System.out.println("\nValor do saque: R$" + valorSaque);
+            System.out.println("\nNotas fornecidas:");
+            if (notasUsadas[0] > 0) System.out.println("Notas de R$100: " + notasUsadas[0]);
+            if (notasUsadas[1] > 0) System.out.println("Notas de R$50: " + notasUsadas[1]);
+            if (notasUsadas[2] > 0) System.out.println("Notas de R$10: " + notasUsadas[2]);
+            if (notasUsadas[3] > 0) System.out.println("Notas de R$5: " + notasUsadas[3]);
+            if (notasUsadas[4] > 0) System.out.println("Notas de R$2: " + notasUsadas[4]);
+            
+            System.out.println("\nEstoque atualizado:");
+            System.out.println("Notas de R$100: " + estoqueNotas[0]);
+            System.out.println("Notas de R$50: " + estoqueNotas[1]);
+            System.out.println("Notas de R$10: " + estoqueNotas[2]);
+            System.out.println("Notas de R$5: " + estoqueNotas[3]);
+            System.out.println("Notas de R$2: " + estoqueNotas[4]);
+        } else {
+            System.out.println("Não foi possível realizar o saque de R$" + valorSaque + 
+                             " com as notas disponíveis.");
+        }
+        
+        return perguntarRepeticao();
+    }
+    
+    public static int perguntarRepeticao() {
+        int resposta;
+        do {
+            System.out.print("\nDeseja realizar outro saque? (1 para SIM, 0 para NÃO): ");
+            resposta = teclado.nextInt();
+            
+            if (resposta != 0 && resposta != 1) {
+                System.out.println("Resposta inválida! Digite 1 para SIM ou 0 para NÃO.");
+            }
+        } while (resposta != 0 && resposta != 1);
+        
+        return resposta;
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
