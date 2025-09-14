@@ -1,0 +1,108 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║         ORDENAÇÃO DE VETORES         ║");
+        System.out.println("║        (10 elementos inteiros)       ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int tamanho = 10;
+        int[] vetorOriginal = new int[tamanho];
+        
+        // Ler os 10 números
+        System.out.println("\nDigite os 10 números inteiros:");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print("Número " + (i + 1) + ": ");
+            vetorOriginal[i] = teclado.nextInt();
+        }
+        
+        // Criar cópia para ordenação crescente
+        int[] vetorCrescente = Arrays.copyOf(vetorOriginal, tamanho);
+        Arrays.sort(vetorCrescente);
+        
+        // Criar vetor decrescente (inverso do crescente)
+        int[] vetorDecrescente = new int[tamanho];
+        for (int i = 0; i < tamanho; i++) {
+            vetorDecrescente[i] = vetorCrescente[tamanho - 1 - i];
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║             RESULTADOS               ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Vetor original:    ");
+        imprimirVetor(vetorOriginal);
+        
+        System.out.print("Vetor crescente:   ");
+        imprimirVetor(vetorCrescente);
+        
+        System.out.print("Vetor decrescente: ");
+        imprimirVetor(vetorDecrescente);
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static void imprimirVetor(int[] vetor) {
+        for (int i = 0; i < vetor.length; i++) {
+            System.out.print(vetor[i]);
+            if (i < vetor.length - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
