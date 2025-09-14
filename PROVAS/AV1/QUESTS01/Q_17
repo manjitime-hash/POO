@@ -1,0 +1,137 @@
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+    private static int[] estoqueNotas = {10, 10, 10, 10, 10}; // [100, 50, 10, 5, 2]
+    private static int[] valoresNotas = {100, 50, 10, 5, 2};
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        int repetir;
+        
+        do {
+            repetir = executarSaque();
+        } while (repetir == 1);
+        
+        System.out.println("Obrigado por utilizar nosso caixa eletrônico!");
+        teclado.close();
+    }
+    
+    public static int executarSaque() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           CAIXA ELETRÔNICO           ║");
+        System.out.println("║    Notas disponíveis: 100,50,10,5,2  ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        // Exibir estoque atual
+        System.out.println("\nEstoque atual de notas:");
+        System.out.println("Notas de R$100: " + estoqueNotas[0]);
+        System.out.println("Notas de R$50: " + estoqueNotas[1]);
+        System.out.println("Notas de R$10: " + estoqueNotas[2]);
+        System.out.println("Notas de R$5: " + estoqueNotas[3]);
+        System.out.println("Notas de R$2: " + estoqueNotas[4]);
+        
+        // Solicitar valor do saque
+        System.out.print("\nDigite o valor do saque (entre 10 e 2000 reais): ");
+        int valorSaque = teclado.nextInt();
+        
+        // Validar valor do saque
+        if (valorSaque < 10 || valorSaque > 2000) {
+            System.out.println("Valor inválido! O saque deve ser entre 10 e 2000 reais.");
+            return perguntarRepeticao();
+        }
+        
+        // Fazer uma cópia do estoque para simulação
+        int[] estoqueTemp = estoqueNotas.clone();
+        int[] notasUsadas = new int[5]; // Para contar quantas notas de cada valor serão usadas
+        int valorRestante = valorSaque;
+        
+        // Verificar se o valor é ímpar
+        if (valorRestante % 2 != 0) {
+            if (estoqueTemp[3] > 0) { // Tem nota de R$5?
+                valorRestante -= 5;
+                notasUsadas[3] += 1;
+                estoqueTemp[3] -= 1;
+            } else {
+                System.out.println("Não é possível realizar o saque. Não há notas de R$5 para compor valor ímpar.");
+                return perguntarRepeticao();
+            }
+        }
+        
+        // Processar as notas da maior para a menor
+        for (int i = 0; i < 4; i++) { // Notas de 100, 50, 10, 2
+            int valorNota = valoresNotas[i];
+            int index = (i == 3) ? 4 : i; // Ajuste para a nota de 2 estar no índice 4
+            
+            while (valorRestante >= valorNota && estoqueTemp[index] > 0) {
+                valorRestante -= valorNota;
+                notasUsadas[index] += 1;
+                estoqueTemp[index] -= 1;
+            }
+        }
+        
+        // Verificar se o saque foi bem-sucedido
+        if (valorRestante == 0) {
+            // Atualizar o estoque real
+            estoqueNotas = estoqueTemp;
+            
+            // Exibir resultado
+            limparTela();
+            System.out.println("╔══════════════════════════════════════╗");
+            System.out.println("║           SAQUE REALIZADO            ║");
+            System.out.println("╚══════════════════════════════════════╝");
+            
+            System.out.println("\nValor do saque: R$" + valorSaque);
+            System.out.println("\nNotas fornecidas:");
+            if (notasUsadas[0] > 0) System.out.println("Notas de R$100: " + notasUsadas[0]);
+            if (notasUsadas[1] > 0) System.out.println("Notas de R$50: " + notasUsadas[1]);
+            if (notasUsadas[2] > 0) System.out.println("Notas de R$10: " + notasUsadas[2]);
+            if (notasUsadas[3] > 0) System.out.println("Notas de R$5: " + notasUsadas[3]);
+            if (notasUsadas[4] > 0) System.out.println("Notas de R$2: " + notasUsadas[4]);
+            
+            System.out.println("\nEstoque atualizado:");
+            System.out.println("Notas de R$100: " + estoqueNotas[0]);
+            System.out.println("Notas de R$50: " + estoqueNotas[1]);
+            System.out.println("Notas de R$10: " + estoqueNotas[2]);
+            System.out.println("Notas de R$5: " + estoqueNotas[3]);
+            System.out.println("Notas de R$2: " + estoqueNotas[4]);
+        } else {
+            System.out.println("Não foi possível realizar o saque de R$" + valorSaque + 
+                             " com as notas disponíveis.");
+        }
+        
+        return perguntarRepeticao();
+    }
+    
+    public static int perguntarRepeticao() {
+        int resposta;
+        do {
+            System.out.print("\nDeseja realizar outro saque? (1 para SIM, 0 para NÃO): ");
+            resposta = teclado.nextInt();
+            
+            if (resposta != 0 && resposta != 1) {
+                System.out.println("Resposta inválida! Digite 1 para SIM ou 0 para NÃO.");
+            }
+        } while (resposta != 0 && resposta != 1);
+        
+        return resposta;
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
