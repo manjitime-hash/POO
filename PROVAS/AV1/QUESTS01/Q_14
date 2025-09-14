@@ -1,0 +1,110 @@
+import java.util.Scanner;
+
+public class Main {
+
+    private static Scanner teclado;
+
+    public static void main(String[] args) {
+        teclado = new Scanner(System.in);
+        boolean executarNovamente;
+        
+        do {
+            executarNovamente = executarPrograma();
+        } while (executarNovamente);
+        
+        System.out.println("Programa encerrado. Obrigado!");
+        teclado.close();
+    }
+    
+    public static boolean executarPrograma() {
+        limparTela();
+        
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║      INTERCALAÇÃO DE VETORES         ║");
+        System.out.println("║    (10 elementos cada, 20 no total)  ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        int tamanho = 10;
+        int[] vetor1 = new int[tamanho];
+        int[] vetor2 = new int[tamanho];
+        int[] vetor3 = new int[tamanho * 2];
+        
+        // Ler o primeiro vetor
+        for (int i = 0; i < tamanho; i++) {
+            System.out.println("\nPRIMEIRO VETOR:");
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor1[i] = teclado.nextInt();
+            limparTela() ;
+        }
+        
+        // Ler o segundo vetor
+        for (int i = 0; i < tamanho; i++) {
+            System.out.println("\nSEGUNDO VETOR:");
+            System.out.print("Digite o " + (i + 1) + "º elemento: ");
+            vetor2[i] = teclado.nextInt();
+            limparTela() ;
+        }
+        
+        // Intercalar os vetores
+        for (int i = 0; i < tamanho; i++) {
+            vetor3[i * 2] = vetor1[i];     // Posições pares (0, 2, 4, ...)
+            vetor3[i * 2 + 1] = vetor2[i]; // Posições ímpares (1, 3, 5, ...)
+        }
+        
+        // Exibir os resultados
+        limparTela();
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║           RESULTADOS                 ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        
+        System.out.print("Primeiro vetor:  ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor1[i] + " ");
+        }
+        
+        System.out.print("\nSegundo vetor:   ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor2[i] + " ");
+        }
+        
+        System.out.print("\nVetor intercalado: ");
+        for (int i = 0; i < tamanho * 2; i++) {
+            System.out.print(vetor3[i] + " ");
+        }
+        
+        return perguntarSeDesejaContinuar();
+    }
+    
+    public static boolean perguntarSeDesejaContinuar() {
+        String resposta;
+        do {
+            System.out.print("\n\nDeseja executar novamente? (S/N): ");
+            resposta = teclado.next().toUpperCase();
+            teclado.nextLine(); // Limpar buffer
+            
+            if (resposta.equals("S") || resposta.equals("SIM")) {
+                return true;
+            } else if (resposta.equals("N") || resposta.equals("NAO") || resposta.equals("NÃO")) {
+                return false;
+            } else {
+                System.out.println("Resposta inválida! Digite novamente.");
+            }
+        } while (true);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: imprimir várias linhas em branco se não for possível limpar a tela
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
