@@ -1,32 +1,35 @@
 import java.util.Scanner;
 
-
-public class Main{
+public class Main {
     
-private static Scanner teclado;
+    private static Scanner teclado;
 
- public static void main(String[] args)
-{
-	contador.fim_do_evento;
-	contador.exibir_pessoas;
-	
-	teclado= new Scanner(System.in);//plane de settar 1 se digitar enter
-	
-	contador.adicionar_pessoas=
-}
+    public static void main(String[] args) {
+        contador meuContador = new contador();
+        meuContador.fim_do_evento();
+        
+        teclado = new Scanner(System.in);
+        
+        String entrada = teclado.nextLine();
+        int n = entrada.isEmpty() ? 1 : Integer.parseInt(entrada);
+        
+        meuContador.adicionar_pessoas(n);
+        meuContador.exibir_pessoas();
+    }
 }
 
-public class contador 
-{
-    int pessoas_na_sala=0 ; 
+class contador {
+    int pessoas_na_sala = 0;
     
-    void fim_do_evento (){
-        pessoas_na_sala=0 ;
+    void fim_do_evento() {
+        pessoas_na_sala = 0;
     }
-    void adicionar_pessoas(int n){
-        pessoas_na_sala=pessoas_na_sala+1*n;
+    
+    void adicionar_pessoas(int n) {
+        pessoas_na_sala += n;
     }
-    void exibir_pessoas(){
-        System.out.printf("numero de pessoas na sala: %d",pessoas_na_sala);
+    
+    void exibir_pessoas() {
+        System.out.println("Pessoas na sala: " + pessoas_na_sala);
     }
 }
