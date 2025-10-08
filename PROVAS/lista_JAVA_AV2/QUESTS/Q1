@@ -1,1 +1,32 @@
+import java.util.Scanner;
 
+
+public class Main{
+    
+private static Scanner teclado;
+
+ public static void main(String[] args)
+{
+	contador.fim_do_evento;
+	contador.exibir_pessoas;
+	
+	teclado= new Scanner(System.in);//plane de settar 1 se digitar enter
+	
+	contador.adicionar_pessoas=
+}
+}
+
+public class contador 
+{
+    int pessoas_na_sala=0 ; 
+    
+    void fim_do_evento (){
+        pessoas_na_sala=0 ;
+    }
+    void adicionar_pessoas(int n){
+        pessoas_na_sala=pessoas_na_sala+1*n;
+    }
+    void exibir_pessoas(){
+        System.out.printf("numero de pessoas na sala: %d",pessoas_na_sala);
+    }
+}
