@@ -1,0 +1,210 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Pessoa {
+    private String nome;
+    private Pessoa pai;
+    private Pessoa mae;
+    
+    public Pessoa(String nome, Pessoa pai, Pessoa mae) {
+        this.nome = nome;
+        this.pai = pai;
+        this.mae = mae;
+    }
+    
+    public Pessoa(String nome) {
+        this(nome, null, null);
+    }
+    
+    public String getNome() {
+        return nome;
+    }
+    
+    public Pessoa getPai() {
+        return pai;
+    }
+    
+    public Pessoa getMae() {
+        return mae;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Pessoa pessoa = (Pessoa) obj;
+        
+        if (nome == null) {
+            if (pessoa.nome != null) return false;
+        } else if (!nome.equals(pessoa.nome)) {
+            return false;
+        }
+        
+        if (mae == null) {
+            return pessoa.mae == null;
+        } else {
+            return mae.equals(pessoa.mae);
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = nome != null ? nome.hashCode() : 0;
+        result = 31 * result + (mae != null ? mae.hashCode() : 0);
+        return result;
+    }
+    
+    @Override
+    public String toString() {
+        String paiNome = (pai != null) ? pai.getNome() : "Desconhecido";
+        String maeNome = (mae != null) ? mae.getNome() : "Desconhecida";
+        return "Pessoa{nome='" + nome + "', pai=" + paiNome + ", mãe=" + maeNome + "}";
+    }
+}
+
+public class Main {
+    private static List<Pessoa> pessoas = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+    
+    public static void main(String[] args) {
+        System.out.println("=== SISTEMA GENEALÓGICO DIGITAL ===");
+        
+        int opcao;
+        do {
+            exibirMenu();
+            opcao = lerInteiro("Escolha uma opção: ");
+            
+            switch (opcao) {
+                case 1:
+                    cadastrarPessoa();
+                    break;
+                case 2:
+                    listarPessoas();
+                    break;
+                case 3:
+                    compararPessoas();
+                    break;
+                case 4:
+                    System.out.println("Saindo do sistema...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        } while (opcao != 4);
+        
+        scanner.close();
+    }
+    
+    private static void exibirMenu() {
+        System.out.println("\n--- MENU ---");
+        System.out.println("1. Cadastrar pessoa");
+        System.out.println("2. Listar pessoas cadastradas");
+        System.out.println("3. Comparar duas pessoas");
+        System.out.println("4. Sair");
+    }
+    
+    private static void cadastrarPessoa() {
+        System.out.println("\n--- CADASTRAR PESSOA ---");
+        String nome = lerString("Digite o nome da pessoa: ");
+        
+        // Mostrar pessoas já cadastradas para selecionar como pai/mãe
+        Pessoa pai = null;
+        Pessoa mae = null;
+        
+        if (!pessoas.isEmpty()) {
+            System.out.println("\nPessoas cadastradas:");
+            for (int i = 0; i < pessoas.size(); i++) {
+                System.out.println((i + 1) + ". " + pessoas.get(i).getNome());
+            }
+            
+            String temPai = lerString("Deseja selecionar um pai? (s/n): ");
+            if (temPai.equalsIgnoreCase("s")) {
+                int indicePai = lerInteiro("Digite o número do pai: ") - 1;
+                if (indicePai >= 0 && indicePai < pessoas.size()) {
+                    pai = pessoas.get(indicePai);
+                } else {
+                    System.out.println("Índice inválido! Pai não será definido.");
+                }
+            }
+            
+            String temMae = lerString("Deseja selecionar uma mãe? (s/n): ");
+            if (temMae.equalsIgnoreCase("s")) {
+                int indiceMae = lerInteiro("Digite o número da mãe: ") - 1;
+                if (indiceMae >= 0 && indiceMae < pessoas.size()) {
+                    mae = pessoas.get(indiceMae);
+                } else {
+                    System.out.println("Índice inválido! Mãe não será definida.");
+                }
+            }
+        }
+        
+        Pessoa novaPessoa = new Pessoa(nome, pai, mae);
+        pessoas.add(novaPessoa);
+        System.out.println("Pessoa cadastrada com sucesso!");
+        System.out.println(novaPessoa);
+    }
+    
+    private static void listarPessoas() {
+        System.out.println("\n--- PESSOAS CADASTRADAS ---");
+        if (pessoas.isEmpty()) {
+            System.out.println("Nenhuma pessoa cadastrada.");
+        } else {
+            for (int i = 0; i < pessoas.size(); i++) {
+                System.out.println((i + 1) + ". " + pessoas.get(i));
+            }
+        }
+    }
+    
+    private static void compararPessoas() {
+        if (pessoas.size() < 2) {
+            System.out.println("É necessário ter pelo menos 2 pessoas cadastradas para comparar.");
+            return;
+        }
+        
+        System.out.println("\n--- COMPARAR PESSOAS ---");
+        listarPessoas();
+        
+        int indice1 = lerInteiro("Digite o número da primeira pessoa: ") - 1;
+        int indice2 = lerInteiro("Digite o número da segunda pessoa: ") - 1;
+        
+        if (indice1 < 0 || indice1 >= pessoas.size() || indice2 < 0 || indice2 >= pessoas.size()) {
+            System.out.println("Índices inválidos!");
+            return;
+        }
+        
+        Pessoa pessoa1 = pessoas.get(indice1);
+        Pessoa pessoa2 = pessoas.get(indice2);
+        
+        System.out.println("\nComparando:");
+        System.out.println("Pessoa 1: " + pessoa1);
+        System.out.println("Pessoa 2: " + pessoa2);
+        
+        boolean saoIguais = pessoa1.equals(pessoa2);
+        System.out.println("\nResultado: " + saoIguais);
+        
+        if (saoIguais) {
+            System.out.println("As pessoas são semanticamente iguais (mesmo nome e mesma mãe).");
+        } else {
+            System.out.println("As pessoas NÃO são semanticamente iguais.");
+        }
+    }
+    
+    private static String lerString(String mensagem) {
+        System.out.print(mensagem);
+        return scanner.nextLine();
+    }
+    
+    private static int lerInteiro(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                int valor = Integer.parseInt(scanner.nextLine());
+                return valor;
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, digite um número válido.");
+            }
+        }
+    }
+}
