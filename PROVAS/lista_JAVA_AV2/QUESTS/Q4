@@ -1,0 +1,365 @@
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+// 🔷 CLASSE ABSTRATA PARA DEMONSTRAR HERANÇA E POLIMORFISMO
+abstract class Forma {
+    protected Ponto2D centro;
+    
+    public Forma(Ponto2D centro) {
+        this.centro = centro;
+    }
+    
+    // 🔷 MÉTODOS ABSTRATOS PARA POLIMORFISMO
+    public abstract double area();
+    public abstract double perimetro();
+    public abstract void mostrarInfo();
+    
+    // 🔷 MÉTODO CONCRETO COMPARTILHADO
+    public void mover(Ponto2D novoCentro) {
+        if (novoCentro == null) {
+            throw new IllegalArgumentException("Centro não pode ser nulo!");
+        }
+        this.centro = novoCentro;
+    }
+    
+    public Ponto2D getCentro() {
+        return centro;
+    }
+}
+
+// 🔷 CLASSE CIRCULO COM HERANÇA
+class Circulo extends Forma {
+    private double raio;
+    
+    // 🏗️ CONSTRUTORES
+    public Circulo(double raio, Ponto2D centro) {
+        super(centro);
+        setRaio(raio);
+    }
+    
+    public Circulo(double raio) {
+        this(raio, new Ponto2D());
+    }
+    
+    // 🔒 ENCAPSULAMENTO - Getter/Setter com validação
+    public double getRaio() { 
+        return raio; 
+    }
+    
+    public void setRaio(double raio) {
+        if (raio < 0) {
+            throw new IllegalArgumentException("Raio não pode ser negativo!");
+        }
+        this.raio = raio;
+    }
+    
+    // 🔷 POLIMORFISMO - Implementação dos métodos abstratos
+    @Override
+    public double area() {
+        return Math.PI * raio * raio;
+    }
+    
+    @Override
+    public double perimetro() {
+        return 2 * Math.PI * raio;
+    }
+    
+    @Override
+    public void mostrarInfo() {
+        System.out.printf("○ Círculo: Raio=%.2f, Centro=%s, Área=%.2f, Perímetro=%.2f%n", 
+                         raio, centro, area(), perimetro());
+    }
+    
+    // 📏 MÉTODOS ESPECÍFICOS DA CLASSE
+    public void inflar(double quantidade) {
+        try {
+            setRaio(raio + quantidade);
+            System.out.printf("✅ Círculo inflado para raio %.2f%n", raio);
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Erro ao inflar: " + e.getMessage());
+        }
+    }
+    
+    public void desinflar(double quantidade) {
+        try {
+            setRaio(Math.max(0, raio - quantidade));
+            System.out.printf("✅ Círculo desinflado para raio %.2f%n", raio);
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Erro ao desinflar: " + e.getMessage());
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Círculo[raio=%.2f, centro=%s]", raio, centro);
+    }
+}
+
+// 🔷 CLASSE PONTO2D
+class Ponto2D {
+    private double x, y;
+    
+    public Ponto2D() { 
+        this(0.0, 0.0); 
+    }
+    
+    public Ponto2D(double x, double y) { 
+        this.x = x; 
+        this.y = y; 
+    }
+    
+    public Ponto2D(Ponto2D outro) { 
+        this.x = outro.x; 
+        this.y = outro.y; 
+    }
+    
+    // 🔒 ENCAPSULAMENTO - Getters/Setters
+    public double getX() { return x; }
+    public double getY() { return y; }
+    
+    public void setX(double x) { this.x = x; }
+    public void setY(double y) { this.y = y; }
+    
+    public void setCoordenadas(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    // 🔷 MÉTODOS DE COMPARAÇÃO
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Ponto2D ponto = (Ponto2D) obj;
+        return Math.abs(x - ponto.x) < 1e-9 && Math.abs(y - ponto.y) < 1e-9;
+    }
+    
+    public double distancia(Ponto2D outro) {
+        if (outro == null) {
+            throw new IllegalArgumentException("Ponto não pode ser nulo!");
+        }
+        double dx = x - outro.x, dy = y - outro.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    @Override
+    public String toString() { 
+        return String.format("(%.2f, %.2f)", x, y); 
+    }
+}
+
+// 🎮 CLASSE PRINCIPAL COM SISTEMA DE PAUSA
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    
+    public static void main(String[] args) {
+        limparTerminal();
+        System.out.println("🎨 SISTEMA DE DESIGN GRÁFICO 2D");
+        System.out.println("================================\n");
+        
+        Forma[] formas = new Forma[2];
+        
+        try {
+            formas[0] = new Circulo(5.0, new Ponto2D(1.0, 1.0));
+            formas[1] = new Circulo(3.0);
+            
+            boolean executando = true;
+            while (executando) {
+                exibirMenu();
+                executando = processarOpcao(formas);
+                
+                // 🆕 PAUSA APÓS CADA AÇÃO (exceto sair e limpar terminal)
+                if (executando) {
+                    pausarELimpar();
+                }
+            }
+            
+        } catch (Exception e) {
+            System.out.println("❌ Erro crítico: " + e.getMessage());
+            pausarELimpar();
+        } finally {
+            System.out.println("\n👋 Programa encerrado!");
+            scanner.close();
+        }
+    }
+    
+    private static void exibirMenu() {
+        System.out.println("\n" + "═".repeat(50));
+        System.out.println("1. Criar novo círculo");
+        System.out.println("2. Mostrar informações das formas");
+        System.out.println("3. Inflar/Desinflar círculos");
+        System.out.println("4. Mover círculos");
+        System.out.println("5. Demonstrar polimorfismo");
+        System.out.println("6. Limpar terminal");
+        System.out.println("7. Sair");
+        System.out.println("═".repeat(50));
+        System.out.print("Escolha: ");
+    }
+    
+    private static boolean processarOpcao(Forma[] formas) {
+        try {
+            int opcao = scanner.nextInt();
+            
+            switch (opcao) {
+                case 1:
+                    criarCirculo(formas);
+                    return true;
+                case 2:
+                    mostrarFormas(formas);
+                    return true;
+                case 3:
+                    inflarDesinflar(formas);
+                    return true;
+                case 4:
+                    moverFormas(formas);
+                    return true;
+                case 5:
+                    demonstrarPolimorfismo(formas);
+                    return true;
+                case 6:
+                    limparTerminal();
+                    return true;
+                case 7:
+                    return false;
+                default:
+                    System.out.println("❌ Opção inválida!");
+                    return true;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("❌ Erro: Digite um número válido!");
+            scanner.nextLine();
+            return true;
+        }
+    }
+    
+    private static void criarCirculo(Forma[] formas) {
+        try {
+            System.out.print("Digite o raio do círculo: ");
+            double raio = scanner.nextDouble();
+            
+            System.out.print("Digite a coordenada X do centro: ");
+            double x = scanner.nextDouble();
+            System.out.print("Digite a coordenada Y do centro: ");
+            double y = scanner.nextDouble();
+            
+            formas[0] = new Circulo(raio, new Ponto2D(x, y));
+            System.out.println("✅ Novo círculo criado com sucesso!");
+            
+        } catch (InputMismatchException e) {
+            System.out.println("❌ Erro: Digite números válidos!");
+            scanner.nextLine();
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Erro: " + e.getMessage());
+        }
+    }
+    
+    private static void mostrarFormas(Forma[] formas) {
+        System.out.println("\n📊 INFORMAÇÕES DAS FORMAS:");
+        for (int i = 0; i < formas.length; i++) {
+            if (formas[i] != null) {
+                System.out.print((i + 1) + ". ");
+                formas[i].mostrarInfo();
+            }
+        }
+    }
+    
+    private static void inflarDesinflar(Forma[] formas) {
+        try {
+            System.out.print("Qual círculo (1 ou 2)? ");
+            int index = scanner.nextInt() - 1;
+            
+            if (index < 0 || index >= formas.length || formas[index] == null) {
+                System.out.println("❌ Círculo inválido!");
+                return;
+            }
+            
+            System.out.print("1. Inflar\n2. Desinflar\nEscolha: ");
+            int acao = scanner.nextInt();
+            System.out.print("Quantidade: ");
+            double quantidade = scanner.nextDouble();
+            
+            Circulo circulo = (Circulo) formas[index];
+            if (acao == 1) {
+                circulo.inflar(quantidade);
+            } else if (acao == 2) {
+                circulo.desinflar(quantidade);
+            } else {
+                System.out.println("❌ Ação inválida!");
+            }
+            
+        } catch (InputMismatchException e) {
+            System.out.println("❌ Erro: Digite números válidos!");
+            scanner.nextLine();
+        } catch (ClassCastException e) {
+            System.out.println("❌ Erro: Esta forma não é um círculo!");
+        }
+    }
+    
+    private static void moverFormas(Forma[] formas) {
+        try {
+            System.out.print("Qual forma mover (1 ou 2)? ");
+            int index = scanner.nextInt() - 1;
+            
+            if (index < 0 || index >= formas.length || formas[index] == null) {
+                System.out.println("❌ Forma inválida!");
+                return;
+            }
+            
+            System.out.print("Novo X: ");
+            double x = scanner.nextDouble();
+            System.out.print("Novo Y: ");
+            double y = scanner.nextDouble();
+            
+            formas[index].mover(new Ponto2D(x, y));
+            System.out.println("✅ Forma movida com sucesso!");
+            
+        } catch (InputMismatchException e) {
+            System.out.println("❌ Erro: Digite números válidos!");
+            scanner.nextLine();
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Erro: " + e.getMessage());
+        }
+    }
+    
+    private static void demonstrarPolimorfismo(Forma[] formas) {
+        System.out.println("\n🎭 DEMONSTRAÇÃO DE POLIMORFISMO");
+        System.out.println("Mesma interface, comportamentos específicos:\n");
+        
+        for (Forma forma : formas) {
+            if (forma != null) {
+                System.out.printf("Área: %.2f | ", forma.area());
+                System.out.printf("Perímetro: %.2f | ", forma.perimetro());
+                forma.mostrarInfo();
+            }
+        }
+    }
+    
+    // 🆕 MÉTODO DE PAUSA E LIMPEZA
+    private static void pausarELimpar() {
+        System.out.println("\n⏸️  Pressione Enter para continuar...");
+        scanner.nextLine(); // Limpa o buffer do nextInt anterior
+        scanner.nextLine(); // Espera o Enter do usuário
+        limparTerminal();
+        
+        // 🆕 MOSTRA O RESULTADO DA AÇÃO NOVAMENTE
+        System.out.println("🎨 SISTEMA DE DESIGN GRÁFICO 2D");
+        System.out.println("================================\n");
+        System.out.println("✅ Ação concluída! Menu principal:");
+    }
+    
+    // 🧹 MÉTODO PARA LIMPAR TERMINAL
+    public static void limparTerminal() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
