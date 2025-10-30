@@ -1,35 +1,111 @@
 import java.util.Scanner;
 
-public class Main {
+class Contador {
+    private int total;
     
-    private static Scanner teclado;
-
-    public static void main(String[] args) {
-        contador meuContador = new contador();
-        meuContador.fim_do_evento();
-        
-        teclado = new Scanner(System.in);
-        
-        String entrada = teclado.nextLine();
-        int n = entrada.isEmpty() ? 1 : Integer.parseInt(entrada);
-        
-        meuContador.adicionar_pessoas(n);
-        meuContador.exibir_pessoas();
+    public Contador() {
+        this.total = 0;
+    }
+    
+    public void zerar() {
+        total = 0;
+        System.out.println("🔄 Contador zerado!");
+    }
+    
+    public void incrementar(int quantidade) {
+        if (quantidade > 0) {
+            total += quantidade;
+            // MENSAGEM ÚNICA E INTELIGENTE
+            String plural = quantidade > 1 ? "pessoas" : "pessoa";
+            System.out.println("✅ +" + quantidade + " " + plural + ". Total: " + total);
+        } else {
+            System.out.println("❌ Quantidade deve ser positiva!");
+        }
+    }
+    
+    public int getValor() {
+        return total;
     }
 }
 
-class contador {
-    int pessoas_na_sala = 0;
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Contador contador = new Contador();
     
-    void fim_do_evento() {
-        pessoas_na_sala = 0;
+    public static void main(String[] args) {
+        System.out.println("🎪 SISTEMA SIMPLES DE CONTROLE DE ACESSO");
+        
+        boolean executando = true;
+        while (executando) {
+            exibirMenu(); // MÉTODO ÚNICO PARA MENU
+            executando = processarOpcao(lerOpcao()); //MÉTODO ÚNICO PARA PROCESSAR
+        }
+        
+        scanner.close();
     }
     
-    void adicionar_pessoas(int n) {
-        pessoas_na_sala += n;
+    //MÉTODO ÚNICO PARA EXIBIR MENU
+    private static void exibirMenu() {
+        System.out.println("\n" + "=".repeat(40));
+        System.out.println("1. Pessoa(s) entrou/entraram");
+        System.out.println("2. Zerar contador");
+        System.out.println("3. Ver total");
+        System.out.println("4. Sair");
+        System.out.println("=".repeat(40));
+        System.out.print("Escolha: ");
     }
     
-    void exibir_pessoas() {
-        System.out.println("Pessoas na sala: " + pessoas_na_sala);
+    //MÉTODO ÚNICO PARA LER OPÇÕES
+    private static int lerOpcao() {
+        try {
+            return scanner.nextInt();
+        } catch (Exception e) {
+            System.out.println("❌ Erro! Digite apenas números.");
+            scanner.nextLine(); // Limpa o buffer
+            return -1; // Opção inválida
+        }
+    }
+    
+    //MÉTODO ÚNICO PARA PROCESSAR TODAS AS OPÇÕES
+    private static boolean processarOpcao(int opcao) {
+        switch (opcao) {
+            case 1:
+                adicionarPessoas();
+                return true;
+            case 2:
+                contador.zerar();
+                return true;
+            case 3:
+                System.out.println("👥 Total de pessoas: " + contador.getValor());
+                return true;
+            case 4:
+                System.out.println("👋 Até logo!");
+                return false;
+            default:
+                System.out.println("❌ Opção inválida! Use 1, 2, 3 ou 4.");
+                return true;
+        }
+    }
+    
+    //MÉTODO SIMPLIFICADO PARA ADICIONAR PESSOAS
+    private static void adicionarPessoas() {
+        try {
+            System.out.print("Quantas pessoas? (Enter = 1): ");
+            scanner.nextLine(); // Limpa buffer
+            
+            String entrada = scanner.nextLine().trim();
+            int quantidade = entrada.isEmpty() ? 1 : Integer.parseInt(entrada);
+            
+            if (entrada.isEmpty()) {
+                System.out.println("⚡ Entrada rápida: 1 pessoa");
+            }
+            
+            contador.incrementar(quantidade);
+            
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Erro! Digite um número válido.");
+        } catch (Exception e) {
+            System.out.println("❌ Erro inesperado: " + e.getMessage());
+        }
     }
 }
