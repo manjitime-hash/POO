@@ -1,0 +1,374 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+/**
+ * CLASSE VEICULO
+ * Classe base que representa um veículo genérico na locadora
+ * Atributos básicos: marca e modelo
+ */
+class Veiculo {
+    // ATRIBUTOS ENCAPSULADOS (Item a)
+    private String marca;
+    private String modelo;
+    
+    // CONSTRUTOR
+    public Veiculo(String marca, String modelo) {
+        this.marca = marca;
+        this.modelo = modelo;
+    }
+    
+    // CONSTRUTOR VAZIO (para facilitar a criação via usuário)
+    public Veiculo() {}
+    
+    // MÉTODOS DE ACESSO (GETTERS) - Item b
+    public String getMarca() {
+        return marca;
+    }
+    
+    public String getModelo() {
+        return modelo;
+    }
+    
+    // MÉTODOS MODIFICADORES (SETTERS) - Item b
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+    
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
+    }
+    
+    // MÉTODO toString() DA CLASSE BASE
+    @Override
+    public String toString() {
+        return String.format("Veículo: %s %s", marca, modelo);
+    }
+    
+    // MÉTODO PARA CRIAR VEÍCULO VIA USUÁRIO
+    public static Veiculo criarVeiculoUsuario() {
+        Scanner scanner = new Scanner(System.in);
+        Veiculo veiculo = new Veiculo();
+        
+        System.out.print("Digite a marca do veículo: ");
+        veiculo.setMarca(scanner.nextLine());
+        
+        System.out.print("Digite o modelo do veículo: ");
+        veiculo.setModelo(scanner.nextLine());
+        
+        return veiculo;
+    }
+}
+
+/**
+ * CLASSE CARRO - Item c
+ * Herda de Veiculo e adiciona número de portas
+ */
+class Carro extends Veiculo {
+    // ATRIBUTO ESPECÍFICO DE CARRO
+    private int numeroPortas;
+    
+    // CONSTRUTOR
+    public Carro(String marca, String modelo, int numeroPortas) {
+        super(marca, modelo); // Chama construtor da classe pai
+        this.numeroPortas = numeroPortas;
+    }
+    
+    // CONSTRUTOR VAZIO
+    public Carro() {}
+    
+    // GETTER E SETTER PARA NÚMERO DE PORTAS
+    public int getNumeroPortas() {
+        return numeroPortas;
+    }
+    
+    public void setNumeroPortas(int numeroPortas) {
+        this.numeroPortas = numeroPortas;
+    }
+    
+    // MÉTODO toString() SOBRESCRITO - Item e
+    @Override
+    public String toString() {
+        return String.format("Carro: %s %s - %d portas", 
+                           getMarca(), getModelo(), numeroPortas);
+    }
+    
+    // MÉTODO PARA CRIAR CARRO VIA USUÁRIO
+    public static Carro criarCarroUsuario() {
+        Scanner scanner = new Scanner(System.in);
+        Carro carro = new Carro();
+        
+        // Usa o método da classe pai para marca e modelo
+        System.out.print("Digite a marca do carro: ");
+        carro.setMarca(scanner.nextLine());
+        
+        System.out.print("Digite o modelo do carro: ");
+        carro.setModelo(scanner.nextLine());
+        
+        System.out.print("Digite o número de portas: ");
+        carro.setNumeroPortas(scanner.nextInt());
+        scanner.nextLine(); // Limpar buffer
+        
+        return carro;
+    }
+}
+
+/**
+ * CLASSE MOTO - Item d
+ * Herda de Veiculo e adiciona cilindradas
+ */
+class Moto extends Veiculo {
+    // ATRIBUTO ESPECÍFICO DE MOTO
+    private int cilindradas;
+    
+    // CONSTRUTOR
+    public Moto(String marca, String modelo, int cilindradas) {
+        super(marca, modelo); // Chama construtor da classe pai
+        this.cilindradas = cilindradas;
+    }
+    
+    // CONSTRUTOR VAZIO
+    public Moto() {}
+    
+    // GETTER E SETTER PARA CILINDRADAS
+    public int getCilindradas() {
+        return cilindradas;
+    }
+    
+    public void setCilindradas(int cilindradas) {
+        this.cilindradas = cilindradas;
+    }
+    
+    // MÉTODO toString() SOBRESCRITO - Item e
+    @Override
+    public String toString() {
+        return String.format("Moto: %s %s - %d cc", 
+                           getMarca(), getModelo(), cilindradas);
+    }
+    
+    // MÉTODO PARA CRIAR MOTO VIA USUÁRIO
+    public static Moto criarMotoUsuario() {
+        Scanner scanner = new Scanner(System.in);
+        Moto moto = new Moto();
+        
+        // Usa o método da classe pai para marca e modelo
+        System.out.print("Digite a marca da moto: ");
+        moto.setMarca(scanner.nextLine());
+        
+        System.out.print("Digite o modelo da moto: ");
+        moto.setModelo(scanner.nextLine());
+        
+        System.out.print("Digite as cilindradas: ");
+        moto.setCilindradas(scanner.nextInt());
+        scanner.nextLine(); // Limpar buffer
+        
+        return moto;
+    }
+}
+
+/**
+ * CLASSE PRINCIPAL MAIN
+ * Gerencia o sistema de locadora com menu interativo
+ */
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    private static List<Veiculo> frota = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        System.out.println("=== SISTEMA DE LOCADORA DE VEÍCULOS ===");
+        
+        int opcao;
+        do {
+            exibirMenu();
+            opcao = lerInteiro("Escolha uma opção: ");
+            
+            switch (opcao) {
+                case 1:
+                    cadastrarCarro();
+                    break;
+                case 2:
+                    cadastrarMoto();
+                    break;
+                case 3:
+                    listarVeiculos();
+                    break;
+                case 4:
+                    listarCarros();
+                    break;
+                case 5:
+                    listarMotos();
+                    break;
+                case 6:
+                    buscarPorMarca();
+                    break;
+                case 7:
+                    estatisticasFrota();
+                    break;
+                case 0:
+                    System.out.println("Saindo do sistema...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        } while (opcao != 0);
+        
+        scanner.close();
+    }
+    
+    /**
+     * Exibe o menu principal do sistema
+     */
+    private static void exibirMenu() {
+        System.out.println("\n=== MENU PRINCIPAL ===");
+        System.out.println("1. Cadastrar Carro");
+        System.out.println("2. Cadastrar Moto");
+        System.out.println("3. Listar Todos os Veículos");
+        System.out.println("4. Listar Apenas Carros");
+        System.out.println("5. Listar Apenas Motos");
+        System.out.println("6. Buscar Veículo por Marca");
+        System.out.println("7. Estatísticas da Frota");
+        System.out.println("0. Sair");
+    }
+    
+    /**
+     * Cadastra um novo carro na frota
+     */
+    private static void cadastrarCarro() {
+        System.out.println("\n--- CADASTRAR CARRO ---");
+        Carro carro = Carro.criarCarroUsuario();
+        frota.add(carro);
+        System.out.println("Carro cadastrado com sucesso!");
+        System.out.println(carro);
+    }
+    
+    /**
+     * Cadastra uma nova moto na frota
+     */
+    private static void cadastrarMoto() {
+        System.out.println("\n--- CADASTRAR MOTO ---");
+        Moto moto = Moto.criarMotoUsuario();
+        frota.add(moto);
+        System.out.println("Moto cadastrada com sucesso!");
+        System.out.println(moto);
+    }
+    
+    /**
+     * Lista todos os veículos da frota
+     */
+    private static void listarVeiculos() {
+        System.out.println("\n--- TODOS OS VEÍCULOS ---");
+        if (frota.isEmpty()) {
+            System.out.println("Nenhum veículo cadastrado.");
+        } else {
+            for (int i = 0; i < frota.size(); i++) {
+                System.out.println((i + 1) + ". " + frota.get(i));
+            }
+        }
+    }
+    
+    /**
+     * Lista apenas os carros da frota
+     */
+    private static void listarCarros() {
+        System.out.println("\n--- CARROS ---");
+        boolean encontrouCarro = false;
+        
+        for (Veiculo veiculo : frota) {
+            if (veiculo instanceof Carro) {
+                System.out.println(veiculo);
+                encontrouCarro = true;
+            }
+        }
+        
+        if (!encontrouCarro) {
+            System.out.println("Nenhum carro cadastrado.");
+        }
+    }
+    
+    /**
+     * Lista apenas as motos da frota
+     */
+    private static void listarMotos() {
+        System.out.println("\n--- MOTOS ---");
+        boolean encontrouMoto = false;
+        
+        for (Veiculo veiculo : frota) {
+            if (veiculo instanceof Moto) {
+                System.out.println(veiculo);
+                encontrouMoto = true;
+            }
+        }
+        
+        if (!encontrouMoto) {
+            System.out.println("Nenhuma moto cadastrada.");
+        }
+    }
+    
+    /**
+     * Busca veículos por marca
+     */
+    private static void buscarPorMarca() {
+        System.out.print("\nDigite a marca para buscar: ");
+        String marcaBusca = scanner.nextLine().toLowerCase();
+        
+        System.out.println("\n--- RESULTADOS PARA '" + marcaBusca + "' ---");
+        boolean encontrou = false;
+        
+        for (Veiculo veiculo : frota) {
+            if (veiculo.getMarca().toLowerCase().contains(marcaBusca)) {
+                System.out.println(veiculo);
+                encontrou = true;
+            }
+        }
+        
+        if (!encontrou) {
+            System.out.println("Nenhum veículo encontrado com essa marca.");
+        }
+    }
+    
+    /**
+     * Exibe estatísticas da frota
+     */
+    private static void estatisticasFrota() {
+        System.out.println("\n--- ESTATÍSTICAS DA FROTA ---");
+        
+        int totalVeiculos = frota.size();
+        int totalCarros = 0;
+        int totalMotos = 0;
+        
+        // Conta carros e motos
+        for (Veiculo veiculo : frota) {
+            if (veiculo instanceof Carro) {
+                totalCarros++;
+            } else if (veiculo instanceof Moto) {
+                totalMotos++;
+            }
+        }
+        
+        System.out.println("Total de veículos: " + totalVeiculos);
+        System.out.println("Total de carros: " + totalCarros);
+        System.out.println("Total de motos: " + totalMotos);
+        
+        if (totalVeiculos > 0) {
+            double percentualCarros = (totalCarros * 100.0) / totalVeiculos;
+            double percentualMotos = (totalMotos * 100.0) / totalVeiculos;
+            
+            System.out.printf("Percentual de carros: %.1f%%\n", percentualCarros);
+            System.out.printf("Percentual de motos: %.1f%%\n", percentualMotos);
+        }
+    }
+    
+    /**
+     * Lê um número inteiro do usuário com tratamento de erro
+     */
+    private static int lerInteiro(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, digite um número válido.");
+            }
+        }
+    }
+}
