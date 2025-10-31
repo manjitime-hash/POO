@@ -1,0 +1,461 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+/**
+ * CLASSE PONTO2D
+ * Representa um ponto no plano cartesiano com coordenadas x e y
+ */
+class Ponto2D {
+    // ATRIBUTOS PRIVADOS
+    private double x;
+    private double y;
+    
+    // a) CONSTRUTORES
+    
+    // i) Construtor padrão - ponto na origem (0,0)
+    public Ponto2D() {
+        this.x = 0.0;
+        this.y = 0.0;
+    }
+    
+    // ii) Construtor com coordenadas x e y
+    public Ponto2D(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    // iii) Construtor de cópia - a partir de outro ponto existente
+    public Ponto2D(Ponto2D outroPonto) {
+        this.x = outroPonto.x;
+        this.y = outroPonto.y;
+    }
+    
+    // b) MÉTODOS DE ACESSO (GETTERS/SETTERS)
+    
+    public double getX() {
+        return x;
+    }
+    
+    public void setX(double x) {
+        this.x = x;
+    }
+    
+    public double getY() {
+        return y;
+    }
+    
+    public void setY(double y) {
+        this.y = y;
+    }
+    
+    // Método para definir ambas coordenadas simultaneamente
+    public void setCoordenadas(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    // c) MÉTODO EQUALS para comparação semântica
+    @Override
+    public boolean equals(Object obj) {
+        // Verifica se é a mesma referência
+        if (this == obj) return true;
+        
+        // Verifica se o objeto é nulo ou de classe diferente
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        // Converte o objeto para Ponto2D
+        Ponto2D ponto = (Ponto2D) obj;
+        
+        // Compara as coordenadas com tolerância para erros de ponto flutuante
+        return Math.abs(x - ponto.x) < 1e-10 && Math.abs(y - ponto.y) < 1e-10;
+    }
+    
+    // d) MÉTODO para calcular distância entre dois pontos
+    /**
+     * Calcula a distância euclidiana entre este ponto e outro ponto
+     * @param outro Ponto2D - o outro ponto
+     * @return double - distância entre os pontos
+     */
+    public double distancia(Ponto2D outro) {
+        double deltaX = this.x - outro.x;
+        double deltaY = this.y - outro.y;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+    
+    /**
+     * Calcula a distância deste ponto até a origem (0,0)
+     * @return double - distância até a origem
+     */
+    public double distanciaDaOrigem() {
+        return Math.sqrt(x * x + y * y);
+    }
+    
+    // MÉTODOS COMPLEMENTARES ÚTEIS
+    
+    /**
+     * Move o ponto por um deslocamento dx e dy
+     * @param dx deslocamento no eixo x
+     * @param dy deslocamento no eixo y
+     */
+    public void transladar(double dx, double dy) {
+        this.x += dx;
+        this.y += dy;
+    }
+    
+    /**
+     * Rotaciona o ponto em torno da origem por um ângulo em radianos
+     * @param anguloRadians ângulo de rotação em radianos
+     */
+    public void rotacionar(double anguloRadians) {
+        double novoX = x * Math.cos(anguloRadians) - y * Math.sin(anguloRadians);
+        double novoY = x * Math.sin(anguloRadians) + y * Math.cos(anguloRadians);
+        this.x = novoX;
+        this.y = novoY;
+    }
+    
+    /**
+     * Verifica em qual quadrante o ponto está
+     * @return número do quadrante (1, 2, 3, 4) ou 0 se estiver sobre um eixo
+     */
+    public int getQuadrante() {
+        if (x > 0 && y > 0) return 1;
+        if (x < 0 && y > 0) return 2;
+        if (x < 0 && y < 0) return 3;
+        if (x > 0 && y < 0) return 4;
+        return 0; // Sobre um eixo ou na origem
+    }
+    
+    /**
+     * Retorna uma representação em string do ponto
+     */
+    @Override
+    public String toString() {
+        return String.format("(%.2f, %.2f)", x, y);
+    }
+    
+    /**
+     * Cria um ponto a partir de entrada do usuário
+     */
+    public static Ponto2D criarPontoUsuario() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite a coordenada x: ");
+        double x = scanner.nextDouble();
+        System.out.print("Digite a coordenada y: ");
+        double y = scanner.nextDouble();
+        scanner.nextLine(); // Limpar buffer
+        return new Ponto2D(x, y);
+    }
+}
+
+/**
+ * CLASSE PRINCIPAL MAIN
+ * Interface interativa para testar a classe Ponto2D
+ */
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    private static List<Ponto2D> pontos = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        System.out.println("=== SISTEMA DE PONTOS 2D ===");
+        
+        // Adiciona alguns pontos de exemplo
+        pontos.add(new Ponto2D()); // Origem
+        pontos.add(new Ponto2D(1.0, 1.0));
+        pontos.add(new Ponto2D(-2.0, 3.0));
+        pontos.add(new Ponto2D(4.0, -1.0));
+        
+        int opcao;
+        do {
+            exibirMenu();
+            opcao = lerInteiro("Escolha uma opção: ");
+            
+            switch (opcao) {
+                case 1:
+                    criarPonto();
+                    break;
+                case 2:
+                    listarPontos();
+                    break;
+                case 3:
+                    compararPontos();
+                    break;
+                case 4:
+                    calcularDistancia();
+                    break;
+                case 5:
+                    calcularDistanciaOrigem();
+                    break;
+                case 6:
+                    transladarPonto();
+                    break;
+                case 7:
+                    rotacionarPonto();
+                    break;
+                case 8:
+                    verificarQuadrante();
+                    break;
+                case 9:
+                    criarCopia();
+                    break;
+                case 0:
+                    System.out.println("Saindo do sistema...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        } while (opcao != 0);
+        
+        scanner.close();
+    }
+    
+    private static void exibirMenu() {
+        System.out.println("\n=== MENU PRINCIPAL ===");
+        System.out.println("1. Criar novo ponto");
+        System.out.println("2. Listar todos os pontos");
+        System.out.println("3. Comparar dois pontos");
+        System.out.println("4. Calcular distância entre dois pontos");
+        System.out.println("5. Calcular distância até a origem");
+        System.out.println("6. Transladar ponto");
+        System.out.println("7. Rotacionar ponto");
+        System.out.println("8. Verificar quadrante do ponto");
+        System.out.println("9. Criar cópia de ponto");
+        System.out.println("0. Sair");
+    }
+    
+    private static void criarPonto() {
+        System.out.println("\n--- CRIAR NOVO PONTO ---");
+        System.out.println("1. Ponto na origem (0,0)");
+        System.out.println("2. Ponto com coordenadas específicas");
+        System.out.println("3. Cópia de ponto existente");
+        
+        int escolha = lerInteiro("Escolha o tipo de ponto: ");
+        
+        switch (escolha) {
+            case 1:
+                Ponto2D origem = new Ponto2D();
+                pontos.add(origem);
+                System.out.println("Ponto criado na origem: " + origem);
+                break;
+                
+            case 2:
+                Ponto2D novoPonto = Ponto2D.criarPontoUsuario();
+                pontos.add(novoPonto);
+                System.out.println("Ponto criado: " + novoPonto);
+                break;
+                
+            case 3:
+                if (pontos.isEmpty()) {
+                    System.out.println("Não há pontos para copiar!");
+                    break;
+                }
+                listarPontos();
+                int index = lerInteiro("Digite o número do ponto a copiar: ") - 1;
+                if (index >= 0 && index < pontos.size()) {
+                    Ponto2D copia = new Ponto2D(pontos.get(index));
+                    pontos.add(copia);
+                    System.out.println("Cópia criada: " + copia);
+                } else {
+                    System.out.println("Índice inválido!");
+                }
+                break;
+                
+            default:
+                System.out.println("Opção inválida!");
+        }
+    }
+    
+    private static void listarPontos() {
+        System.out.println("\n--- LISTA DE PONTOS ---");
+        if (pontos.isEmpty()) {
+            System.out.println("Nenhum ponto cadastrado.");
+        } else {
+            for (int i = 0; i < pontos.size(); i++) {
+                Ponto2D ponto = pontos.get(i);
+                System.out.printf("%d. %s (Quadrante: %d)\n", 
+                    i + 1, ponto, ponto.getQuadrante());
+            }
+        }
+    }
+    
+    private static void compararPontos() {
+        if (pontos.size() < 2) {
+            System.out.println("É necessário ter pelo menos 2 pontos para comparar.");
+            return;
+        }
+        
+        listarPontos();
+        int index1 = lerInteiro("Digite o número do primeiro ponto: ") - 1;
+        int index2 = lerInteiro("Digite o número do segundo ponto: ") - 1;
+        
+        if (index1 >= 0 && index1 < pontos.size() && 
+            index2 >= 0 && index2 < pontos.size()) {
+            
+            Ponto2D p1 = pontos.get(index1);
+            Ponto2D p2 = pontos.get(index2);
+            
+            System.out.println("Ponto 1: " + p1);
+            System.out.println("Ponto 2: " + p2);
+            System.out.println("Os pontos são iguais? " + p1.equals(p2));
+        } else {
+            System.out.println("Índices inválidos!");
+        }
+    }
+    
+    private static void calcularDistancia() {
+        if (pontos.size() < 2) {
+            System.out.println("É necessário ter pelo menos 2 pontos para calcular distância.");
+            return;
+        }
+        
+        listarPontos();
+        int index1 = lerInteiro("Digite o número do primeiro ponto: ") - 1;
+        int index2 = lerInteiro("Digite o número do segundo ponto: ") - 1;
+        
+        if (index1 >= 0 && index1 < pontos.size() && 
+            index2 >= 0 && index2 < pontos.size()) {
+            
+            Ponto2D p1 = pontos.get(index1);
+            Ponto2D p2 = pontos.get(index2);
+            
+            double distancia = p1.distancia(p2);
+            System.out.println("Ponto 1: " + p1);
+            System.out.println("Ponto 2: " + p2);
+            System.out.printf("Distância entre os pontos: %.4f\n", distancia);
+        } else {
+            System.out.println("Índices inválidos!");
+        }
+    }
+    
+    private static void calcularDistanciaOrigem() {
+        if (pontos.isEmpty()) {
+            System.out.println("Não há pontos cadastrados.");
+            return;
+        }
+        
+        listarPontos();
+        int index = lerInteiro("Digite o número do ponto: ") - 1;
+        
+        if (index >= 0 && index < pontos.size()) {
+            Ponto2D ponto = pontos.get(index);
+            double distancia = ponto.distanciaDaOrigem();
+            System.out.println("Ponto: " + ponto);
+            System.out.printf("Distância até a origem: %.4f\n", distancia);
+        } else {
+            System.out.println("Índice inválido!");
+        }
+    }
+    
+    private static void transladarPonto() {
+        if (pontos.isEmpty()) {
+            System.out.println("Não há pontos cadastrados.");
+            return;
+        }
+        
+        listarPontos();
+        int index = lerInteiro("Digite o número do ponto a transladar: ") - 1;
+        
+        if (index >= 0 && index < pontos.size()) {
+            System.out.print("Digite o deslocamento em x: ");
+            double dx = scanner.nextDouble();
+            System.out.print("Digite o deslocamento em y: ");
+            double dy = scanner.nextDouble();
+            scanner.nextLine(); // Limpar buffer
+            
+            Ponto2D ponto = pontos.get(index);
+            System.out.println("Ponto antes da translação: " + ponto);
+            ponto.transladar(dx, dy);
+            System.out.println("Ponto após a translação: " + ponto);
+        } else {
+            System.out.println("Índice inválido!");
+        }
+    }
+    
+    private static void rotacionarPonto() {
+        if (pontos.isEmpty()) {
+            System.out.println("Não há pontos cadastrados.");
+            return;
+        }
+        
+        listarPontos();
+        int index = lerInteiro("Digite o número do ponto a rotacionar: ") - 1;
+        
+        if (index >= 0 && index < pontos.size()) {
+            System.out.print("Digite o ângulo de rotação em graus: ");
+            double anguloGraus = scanner.nextDouble();
+            scanner.nextLine(); // Limpar buffer
+            
+            // Converter graus para radianos
+            double anguloRadians = Math.toRadians(anguloGraus);
+            
+            Ponto2D ponto = pontos.get(index);
+            System.out.println("Ponto antes da rotação: " + ponto);
+            ponto.rotacionar(anguloRadians);
+            System.out.println("Ponto após a rotação: " + ponto);
+        } else {
+            System.out.println("Índice inválido!");
+        }
+    }
+    
+    private static void verificarQuadrante() {
+        if (pontos.isEmpty()) {
+            System.out.println("Não há pontos cadastrados.");
+            return;
+        }
+        
+        listarPontos();
+        int index = lerInteiro("Digite o número do ponto: ") - 1;
+        
+        if (index >= 0 && index < pontos.size()) {
+            Ponto2D ponto = pontos.get(index);
+            int quadrante = ponto.getQuadrante();
+            
+            System.out.println("Ponto: " + ponto);
+            switch (quadrante) {
+                case 1: System.out.println("Quadrante: Primeiro (I)"); break;
+                case 2: System.out.println("Quadrante: Segundo (II)"); break;
+                case 3: System.out.println("Quadrante: Terceiro (III)"); break;
+                case 4: System.out.println("Quadrante: Quarto (IV)"); break;
+                default: System.out.println("O ponto está sobre um eixo ou na origem");
+            }
+        } else {
+            System.out.println("Índice inválido!");
+        }
+    }
+    
+    private static void criarCopia() {
+        if (pontos.isEmpty()) {
+            System.out.println("Não há pontos para copiar.");
+            return;
+        }
+        
+        listarPontos();
+        int index = lerInteiro("Digite o número do ponto a copiar: ") - 1;
+        
+        if (index >= 0 && index < pontos.size()) {
+            Ponto2D original = pontos.get(index);
+            Ponto2D copia = new Ponto2D(original); // Usando construtor de cópia
+            
+            // Modificamos ligeiramente a cópia para demonstrar que são objetos diferentes
+            copia.transladar(0.1, 0.1);
+            
+            pontos.add(copia);
+            System.out.println("Cópia criada com pequena translação: " + copia);
+            System.out.println("Original: " + original);
+            System.out.println("São iguais? " + original.equals(copia));
+        } else {
+            System.out.println("Índice inválido!");
+        }
+    }
+    
+    private static int lerInteiro(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, digite um número válido.");
+            }
+        }
+    }
+}
