@@ -1,0 +1,404 @@
+import java.util.Scanner;
+
+/**
+ * CLASSE RETA
+ * Representa uma reta no plano cartesiano na forma y = ax + b
+ * Onde 'a' é o coeficiente angular e 'b' é o coeficiente linear
+ */
+class Reta {
+    // ATRIBUTOS PRIVADOS
+    private double a; // Coeficiente angular
+    private double b; // Coeficiente linear
+    
+    // a) CONSTRUTORES
+    
+    // i) Construtor com coeficiente angular e linear
+    public Reta(double a, double b) {
+        this.a = a;
+        this.b = b;
+    }
+    
+    // ii) Construtor a partir de dois pontos distintos
+    public Reta(Ponto2D p1, Ponto2D p2) {
+        if (p1.getX() == p2.getX()) {
+            // Reta vertical - caso especial
+            // Para retas verticais, usaremos uma representação diferente
+            // Neste caso, a = Double.POSITIVE_INFINITY e b = x
+            this.a = Double.POSITIVE_INFINITY;
+            this.b = p1.getX();
+        } else {
+            this.a = (p2.getY() - p1.getY()) / (p2.getX() - p1.getX());
+            this.b = p1.getY() - this.a * p1.getX();
+        }
+    }
+    
+    // b) MÉTODOS DE ACESSO (GETTERS/SETTERS)
+    
+    public double getA() {
+        return a;
+    }
+    
+    public void setA(double a) {
+        this.a = a;
+    }
+    
+    public double getB() {
+        return b;
+    }
+    
+    public void setB(double b) {
+        this.b = b;
+    }
+    
+    // c) MÉTODO para verificar se um ponto pertence à reta
+    public boolean pontoPertence(Ponto2D ponto) {
+        if (isVertical()) {
+            // Para reta vertical, verifica se x é igual ao valor armazenado em b
+            return Math.abs(ponto.getX() - b) < 1e-10;
+        } else {
+            // Para reta normal, verifica se y = ax + b
+            double yEsperado = a * ponto.getX() + b;
+            return Math.abs(ponto.getY() - yEsperado) < 1e-10;
+        }
+    }
+    
+    // d) MÉTODO para encontrar interseção com outra reta
+    public Ponto2D interseccao(Reta outra) {
+        // Caso 1: Ambas as retas são verticais
+        if (this.isVertical() && outra.isVertical()) {
+            // Retas verticais paralelas - sem interseção ou coincidentes
+            if (Math.abs(this.b - outra.b) < 1e-10) {
+                // Retas coincidentes - infinitos pontos em comum
+                System.out.println("As retas são coincidentes (infinitos pontos de interseção)");
+            }
+            return null; // Paralelas verticais
+        }
+        
+        // Caso 2: Esta reta é vertical, a outra não
+        if (this.isVertical()) {
+            double x = this.b;
+            double y = outra.a * x + outra.b;
+            return new Ponto2D(x, y);
+        }
+        
+        // Caso 3: A outra reta é vertical, esta não
+        if (outra.isVertical()) {
+            double x = outra.b;
+            double y = this.a * x + this.b;
+            return new Ponto2D(x, y);
+        }
+        
+        // Caso 4: Ambas não verticais
+        // Verifica se são paralelas (mesmo coeficiente angular)
+        if (Math.abs(this.a - outra.a) < 1e-10) {
+            // Verifica se são coincidentes
+            if (Math.abs(this.b - outra.b) < 1e-10) {
+                System.out.println("As retas são coincidentes (infinitos pontos de interseção)");
+            }
+            return null; // Paralelas
+        }
+        
+        // Calcula o ponto de interseção
+        double x = (outra.b - this.b) / (this.a - outra.a);
+        double y = this.a * x + this.b;
+        
+        return new Ponto2D(x, y);
+    }
+    
+    // MÉTODOS AUXILIARES
+    
+    /**
+     * Verifica se a reta é vertical
+     */
+    public boolean isVertical() {
+        return Double.isInfinite(a);
+    }
+    
+    /**
+     * Verifica se a reta é horizontal
+     */
+    public boolean isHorizontal() {
+        return Math.abs(a) < 1e-10;
+    }
+    
+    /**
+     * Calcula o ângulo de inclinação da reta em graus
+     */
+    public double getAnguloInclinacao() {
+        if (isVertical()) {
+            return 90.0;
+        }
+        return Math.toDegrees(Math.atan(a));
+    }
+    
+    /**
+     * Retorna uma string representando a equação da reta
+     */
+    @Override
+    public String toString() {
+        if (isVertical()) {
+            return String.format("x = %.2f", b);
+        }
+        
+        if (Math.abs(a) < 1e-10) {
+            return String.format("y = %.2f", b);
+        }
+        
+        if (Math.abs(b) < 1e-10) {
+            return String.format("y = %.2fx", a);
+        }
+        
+        String sinal = (b > 0) ? " + " : " - ";
+        return String.format("y = %.2fx%s%.2f", a, sinal, Math.abs(b));
+    }
+    
+    /**
+     * Cria uma reta a partir de entrada do usuário (coeficientes)
+     */
+    public static Reta criarRetaCoeficientes() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite o coeficiente angular (a): ");
+        double a = scanner.nextDouble();
+        System.out.print("Digite o coeficiente linear (b): ");
+        double b = scanner.nextDouble();
+        scanner.nextLine(); // Limpar buffer
+        return new Reta(a, b);
+    }
+    
+    /**
+     * Cria uma reta a partir de dois pontos fornecidos pelo usuário
+     */
+    public static Reta criarRetaPontos() {
+        System.out.println("Primeiro ponto:");
+        Ponto2D p1 = Ponto2D.criarPontoUsuario();
+        System.out.println("Segundo ponto:");
+        Ponto2D p2 = Ponto2D.criarPontoUsuario();
+        return new Reta(p1, p2);
+    }
+}
+
+/**
+ * CLASSE PRINCIPAL MAIN
+ * Interface interativa para testar a classe Reta
+ */
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    
+    public static void main(String[] args) {
+        System.out.println("=== SISTEMA DE ANÁLISE DE RETAS ===");
+        
+        Reta reta1 = null;
+        Reta reta2 = null;
+        
+        int opcao;
+        do {
+            exibirMenu();
+            opcao = lerInteiro("Escolha uma opção: ");
+            
+            switch (opcao) {
+                case 1:
+                    reta1 = criarReta();
+                    break;
+                case 2:
+                    reta2 = criarReta();
+                    break;
+                case 3:
+                    exibirRetas(reta1, reta2);
+                    break;
+                case 4:
+                    verificarPontoPertence(reta1, reta2);
+                    break;
+                case 5:
+                    calcularInterseccao(reta1, reta2);
+                    break;
+                case 6:
+                    analisarReta(reta1, reta2);
+                    break;
+                case 0:
+                    System.out.println("Saindo do sistema...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        } while (opcao != 0);
+        
+        scanner.close();
+    }
+    
+    private static void exibirMenu() {
+        System.out.println("\n=== MENU PRINCIPAL ===");
+        System.out.println("1. Criar/Modificar Reta 1");
+        System.out.println("2. Criar/Modificar Reta 2");
+        System.out.println("3. Exibir Retas");
+        System.out.println("4. Verificar se Ponto Pertence à Reta");
+        System.out.println("5. Calcular Interseção das Retas");
+        System.out.println("6. Análise das Retas");
+        System.out.println("0. Sair");
+    }
+    
+    private static Reta criarReta() {
+        System.out.println("\n--- CRIAR RETA ---");
+        System.out.println("1. Usando coeficientes (y = ax + b)");
+        System.out.println("2. Usando dois pontos distintos");
+        
+        int escolha = lerInteiro("Escolha o método: ");
+        
+        switch (escolha) {
+            case 1:
+                return Reta.criarRetaCoeficientes();
+            case 2:
+                return Reta.criarRetaPontos();
+            default:
+                System.out.println("Opção inválida!");
+                return null;
+        }
+    }
+    
+    private static void exibirRetas(Reta reta1, Reta reta2) {
+        System.out.println("\n--- RETAS ATUAIS ---");
+        if (reta1 != null) {
+            System.out.println("Reta 1: " + reta1);
+            System.out.println("  Coeficiente angular: " + reta1.getA());
+            System.out.println("  Coeficiente linear: " + reta1.getB());
+        } else {
+            System.out.println("Reta 1: Não definida");
+        }
+        
+        if (reta2 != null) {
+            System.out.println("Reta 2: " + reta2);
+            System.out.println("  Coeficiente angular: " + reta2.getA());
+            System.out.println("  Coeficiente linear: " + reta2.getB());
+        } else {
+            System.out.println("Reta 2: Não definida");
+        }
+    }
+    
+    private static void verificarPontoPertence(Reta reta1, Reta reta2) {
+        if (reta1 == null && reta2 == null) {
+            System.out.println("Nenhuma reta definida.");
+            return;
+        }
+        
+        System.out.println("\n--- VERIFICAR PONTO NA RETA ---");
+        Ponto2D ponto = Ponto2D.criarPontoUsuario();
+        
+        if (reta1 != null) {
+            boolean pertence1 = reta1.pontoPertence(ponto);
+            System.out.println("O ponto " + ponto + " pertence à Reta 1? " + pertence1);
+        }
+        
+        if (reta2 != null) {
+            boolean pertence2 = reta2.pontoPertence(ponto);
+            System.out.println("O ponto " + ponto + " pertence à Reta 2? " + pertence2);
+        }
+    }
+    
+    private static void calcularInterseccao(Reta reta1, Reta reta2) {
+        if (reta1 == null || reta2 == null) {
+            System.out.println("É necessário definir ambas as retas.");
+            return;
+        }
+        
+        System.out.println("\n--- CÁLCULO DE INTERSEÇÃO ---");
+        System.out.println("Reta 1: " + reta1);
+        System.out.println("Reta 2: " + reta2);
+        
+        Ponto2D interseccao = reta1.interseccao(reta2);
+        
+        if (interseccao != null) {
+            System.out.println("Ponto de interseção: " + interseccao);
+            
+            // Verifica se o ponto realmente pertence a ambas as retas
+            boolean pertence1 = reta1.pontoPertence(interseccao);
+            boolean pertence2 = reta2.pontoPertence(interseccao);
+            System.out.println("Verificação - Pertence à Reta 1: " + pertence1);
+            System.out.println("Verificação - Pertence à Reta 2: " + pertence2);
+        } else {
+            if (reta1.isVertical() && reta2.isVertical()) {
+                if (Math.abs(reta1.getB() - reta2.getB()) < 1e-10) {
+                    System.out.println("As retas são coincidentes verticais.");
+                } else {
+                    System.out.println("As retas são verticais paralelas (sem interseção).");
+                }
+            } else if (Math.abs(reta1.getA() - reta2.getA()) < 1e-10) {
+                if (Math.abs(reta1.getB() - reta2.getB()) < 1e-10) {
+                    System.out.println("As retas são coincidentes.");
+                } else {
+                    System.out.println("As retas são paralelas (sem interseção).");
+                }
+            }
+        }
+    }
+    
+    private static void analisarReta(Reta reta1, Reta reta2) {
+        System.out.println("\n--- ANÁLISE DAS RETAS ---");
+        
+        if (reta1 != null) {
+            System.out.println("ANÁLISE RETA 1:");
+            System.out.println("  Equação: " + reta1);
+            System.out.println("  É vertical: " + reta1.isVertical());
+            System.out.println("  É horizontal: " + reta1.isHorizontal());
+            System.out.printf("  Ângulo de inclinação: %.2f graus\n", reta1.getAnguloInclinacao());
+        }
+        
+        if (reta2 != null) {
+            System.out.println("ANÁLISE RETA 2:");
+            System.out.println("  Equação: " + reta2);
+            System.out.println("  É vertical: " + reta2.isVertical());
+            System.out.println("  É horizontal: " + reta2.isHorizontal());
+            System.out.printf("  Ângulo de inclinação: %.2f graus\n", reta2.getAnguloInclinacao());
+        }
+        
+        if (reta1 != null && reta2 != null) {
+            System.out.println("RELAÇÃO ENTRE AS RETAS:");
+            
+            if (reta1.isVertical() && reta2.isVertical()) {
+                if (Math.abs(reta1.getB() - reta2.getB()) < 1e-10) {
+                    System.out.println("  - São a mesma reta vertical");
+                } else {
+                    System.out.println("  - São retas verticais paralelas");
+                }
+            } else if (Math.abs(reta1.getA() - reta2.getA()) < 1e-10) {
+                if (Math.abs(reta1.getB() - reta2.getB()) < 1e-10) {
+                    System.out.println("  - São a mesma reta (coincidentes)");
+                } else {
+                    System.out.println("  - São retas paralelas");
+                }
+            } else {
+                System.out.println("  - São retas concorrentes");
+                
+                // Calcula o ângulo entre as retas
+                double angulo1 = reta1.getAnguloInclinacao();
+                double angulo2 = reta2.getAnguloInclinacao();
+                double diferencaAngulo = Math.abs(angulo1 - angulo2);
+                if (diferencaAngulo > 90) {
+                    diferencaAngulo = 180 - diferencaAngulo;
+                }
+                System.out.printf("  - Ângulo entre as retas: %.2f graus\n", diferencaAngulo);
+                
+                // Verifica se são perpendiculares
+                if (reta1.isVertical() && reta2.isHorizontal()) {
+                    System.out.println("  - São perpendiculares");
+                } else if (reta2.isVertical() && reta1.isHorizontal()) {
+                    System.out.println("  - São perpendiculares");
+                } else if (!reta1.isVertical() && !reta2.isVertical()) {
+                    double produtoAngulares = reta1.getA() * reta2.getA();
+                    if (Math.abs(produtoAngulares + 1) < 1e-10) {
+                        System.out.println("  - São perpendiculares");
+                    }
+                }
+            }
+        }
+    }
+    
+    private static int lerInteiro(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, digite um número válido.");
+            }
+        }
+    }
+}
