@@ -1,0 +1,696 @@
+import java.util.Scanner;
+
+/**
+ * CLASSE MATRIZ
+ * Implementa operações básicas de álgebra linear para matrizes
+ * Inclui construtores, operações aritméticas e verificações de propriedades
+ */
+class Matriz {
+    // ATRIBUTOS DA CLASSE
+    private double[][] dados;  // Armazena os elementos da matriz em formato bidimensional
+    private int linhas;        // Número de linhas da matriz
+    private int colunas;       // Número de colunas da matriz
+    
+    // a) CONSTRUTOR para inicializar dimensões
+    /**
+     * Construtor que cria uma matriz com as dimensões especificadas
+     * @param linhas - número de linhas da matriz
+     * @param colunas - número de colunas da matriz
+     */
+    public Matriz(int linhas, int colunas) {
+        this.linhas = linhas;
+        this.colunas = colunas;
+        // Inicializa a matriz com zeros
+        this.dados = new double[linhas][colunas];
+    }
+    
+    // b) MÉTODOS DE ACESSO aos elementos
+    /**
+     * Retorna o elemento na posição especificada
+     * @param linha - índice da linha (0-based)
+     * @param coluna - índice da coluna (0-based)
+     * @return valor do elemento na posição [linha][coluna]
+     * @throws IllegalArgumentException se a posição for inválida
+     */
+    public double getElemento(int linha, int coluna) {
+        // Verifica se os índices estão dentro dos limites da matriz
+        if (linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas) {
+            return dados[linha][coluna];
+        }
+        throw new IllegalArgumentException("Posição inválida na matriz");
+    }
+    
+    /**
+     * Define o valor de um elemento na posição especificada
+     * @param linha - índice da linha (0-based)
+     * @param coluna - índice da coluna (0-based)
+     * @param valor - valor a ser armazenado
+     * @throws IllegalArgumentException se a posição for inválida
+     */
+    public void setElemento(int linha, int coluna, double valor) {
+        // Verifica se os índices estão dentro dos limites da matriz
+        if (linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas) {
+            dados[linha][coluna] = valor;
+        } else {
+            throw new IllegalArgumentException("Posição inválida na matriz");
+        }
+    }
+    
+    // c) MÉTODO para somar duas matrizes
+    /**
+     * Realiza a soma desta matriz com outra matriz
+     * @param outra - matriz a ser somada com esta
+     * @return nova matriz com o resultado da soma
+     * @throws IllegalArgumentException se as matrizes tiverem dimensões diferentes
+     */
+    public Matriz somar(Matriz outra) {
+        // Verifica se as matrizes têm as mesmas dimensões
+        if (this.linhas != outra.linhas || this.colunas != outra.colunas) {
+            throw new IllegalArgumentException("Matrizes devem ter as mesmas dimensões para soma");
+        }
+        
+        // Cria uma nova matriz para armazenar o resultado
+        Matriz resultado = new Matriz(linhas, colunas);
+        
+        // Percorre todos os elementos e soma
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                resultado.dados[i][j] = this.dados[i][j] + outra.dados[i][j];
+            }
+        }
+        return resultado;
+    }
+    
+    // =========================================================================
+    // d) OPERAÇÕES COMPLEMENTARES
+    // =========================================================================
+    
+    // i) COMPARAÇÃO SEMÂNTICA (equals)
+    /**
+     * Verifica se duas matrizes são semanticamente iguais
+     * @param obj - objeto a ser comparado
+     * @return true se as matrizes têm as mesmas dimensões e elementos iguais
+     */
+    @Override
+    public boolean equals(Object obj) {
+        // Verifica se é a mesma referência na memória
+        if (this == obj) return true;
+        // Verifica se o objeto é nulo ou de classe diferente
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Matriz matriz = (Matriz) obj;
+        
+        // Verifica se as dimensões são iguais
+        if (linhas != matriz.linhas || colunas != matriz.colunas) return false;
+        
+        // Compara elemento por elemento (com tolerância para erros de ponto flutuante)
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                // Usa uma tolerância de 1e-10 para comparação de doubles
+                if (Math.abs(dados[i][j] - matriz.dados[i][j]) > 1e-10) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    // ii) TRANSPOSTA
+    /**
+     * Calcula a matriz transposta (linhas viram colunas e vice-versa)
+     * @return nova matriz transposta
+     */
+    public Matriz transposta() {
+        // A transposta tem número de linhas = colunas original e vice-versa
+        Matriz resultado = new Matriz(colunas, linhas);
+        
+        // Percorre a matriz original e transpõe os elementos
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                resultado.dados[j][i] = this.dados[i][j];
+            }
+        }
+        return resultado;
+    }
+    
+    // iii) OPOSDA
+    /**
+     * Calcula a matriz oposta (cada elemento multiplicado por -1)
+     * @return nova matriz oposta
+     */
+    public Matriz oposta() {
+        Matriz resultado = new Matriz(linhas, colunas);
+        
+        // Percorre todos os elementos e inverte o sinal
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                resultado.dados[i][j] = -this.dados[i][j];
+            }
+        }
+        return resultado;
+    }
+    
+    // iv) MATRIZ NULA (método estático)
+    /**
+     * Cria uma matriz nula (todos os elementos são zero)
+     * @param linhas - número de linhas
+     * @param colunas - número de colunas
+     * @return nova matriz nula
+     */
+    public static Matriz nula(int linhas, int colunas) {
+        // O construtor já inicializa com zeros, então basta retornar nova matriz
+        return new Matriz(linhas, colunas);
+    }
+    
+    // v) VERIFICAÇÃO SE É IDENTIDADE
+    /**
+     * Verifica se a matriz é identidade (diagonal principal com 1s, outros elementos 0)
+     * @return true se a matriz é identidade
+     */
+    public boolean ehIdentidade() {
+        // Matriz identidade deve ser quadrada
+        if (!ehQuadrada()) return false;
+        
+        // Percorre todos os elementos
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                if (i == j) {
+                    // Elementos da diagonal devem ser 1
+                    if (Math.abs(dados[i][j] - 1.0) > 1e-10) return false;
+                } else {
+                    // Elementos fora da diagonal devem ser 0
+                    if (Math.abs(dados[i][j]) > 1e-10) return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    // vi) VERIFICAÇÃO SE É DIAGONAL
+    /**
+     * Verifica se a matriz é diagonal (todos os elementos fora da diagonal são zero)
+     * @return true se a matriz é diagonal
+     */
+    public boolean ehDiagonal() {
+        // Matriz diagonal deve ser quadrada
+        if (!ehQuadrada()) return false;
+        
+        // Verifica se todos os elementos fora da diagonal são zero
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                if (i != j && Math.abs(dados[i][j]) > 1e-10) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    // vii) VERIFICAÇÃO SE É SINGULAR
+    /**
+     * Verifica se a matriz é singular (determinante = 0)
+     * @return true se o determinante é zero
+     */
+    public boolean ehSingular() {
+        // Apenas matrizes quadradas podem ser singulares
+        if (!ehQuadrada()) return false;
+        
+        // Calcula o determinante e verifica se é próximo de zero
+        return Math.abs(determinante()) < 1e-10;
+    }
+    
+    // viii) VERIFICAÇÃO SE É SIMÉTRICA
+    /**
+     * Verifica se a matriz é simétrica (A = A^T)
+     * @return true se a matriz é igual à sua transposta
+     */
+    public boolean ehSimetrica() {
+        // Apenas matrizes quadradas podem ser simétricas
+        if (!ehQuadrada()) return false;
+        
+        // Verifica se a matriz é igual à sua transposta
+        return this.equals(this.transposta());
+    }
+    
+    // ix) VERIFICAÇÃO SE É ANTI-SIMÉTRICA
+    /**
+     * Verifica se a matriz é anti-simétrica (A = -A^T)
+     * @return true se a matriz é igual ao oposto da sua transposta
+     */
+    public boolean ehAntiSimetrica() {
+        // Apenas matrizes quadradas podem ser anti-simétricas
+        if (!ehQuadrada()) return false;
+        
+        // Verifica se a matriz é igual ao oposto da sua transposta
+        return this.equals(this.transposta().oposta());
+    }
+    
+    // x) SUBTRAÇÃO
+    /**
+     * Subtrai duas matrizes (A - B = A + (-B))
+     * @param outra - matriz a ser subtraída
+     * @return nova matriz com o resultado da subtração
+     */
+    public Matriz subtrair(Matriz outra) {
+        // A subtração é equivalente a somar com a oposta
+        return this.somar(outra.oposta());
+    }
+    
+    // xi) MULTIPLICAÇÃO
+    /**
+     * Multiplica duas matrizes
+     * @param outra - matriz a ser multiplicada
+     * @return nova matriz com o resultado da multiplicação
+     * @throws IllegalArgumentException se o número de colunas da primeira
+     *         não for igual ao número de linhas da segunda
+     */
+    public Matriz multiplicar(Matriz outra) {
+        // Verifica se as dimensões são compatíveis para multiplicação
+        if (this.colunas != outra.linhas) {
+            throw new IllegalArgumentException(
+                "Número de colunas da primeira deve igual ao número de linhas da segunda");
+        }
+        
+        // Cria matriz resultado com linhas da primeira e colunas da segunda
+        Matriz resultado = new Matriz(this.linhas, outra.colunas);
+        
+        // Algoritmo de multiplicação de matrizes O(n³)
+        for (int i = 0; i < this.linhas; i++) {
+            for (int j = 0; j < outra.colunas; j++) {
+                // Calcula o produto interno da linha i com a coluna j
+                for (int k = 0; k < this.colunas; k++) {
+                    resultado.dados[i][j] += this.dados[i][k] * outra.dados[k][j];
+                }
+            }
+        }
+        return resultado;
+    }
+    
+    // xii) CÓPIA DA MATRIZ
+    /**
+     * Cria uma cópia independente desta matriz
+     * @return nova matriz com os mesmos elementos
+     */
+    public Matriz copiar() {
+        Matriz copia = new Matriz(linhas, colunas);
+        
+        // Copia cada linha usando System.arraycopy para eficiência
+        for (int i = 0; i < linhas; i++) {
+            System.arraycopy(this.dados[i], 0, copia.dados[i], 0, colunas);
+        }
+        return copia;
+    }
+    
+    // =========================================================================
+    // MÉTODOS AUXILIARES PRIVADOS
+    // =========================================================================
+    
+    /**
+     * Verifica se a matriz é quadrada
+     * @return true se número de linhas = número de colunas
+     */
+    private boolean ehQuadrada() {
+        return linhas == colunas;
+    }
+    
+    /**
+     * Calcula o determinante da matriz usando expansão por cofatores
+     * @return valor do determinante
+     * @throws IllegalArgumentException se a matriz não for quadrada
+     */
+    public double determinante() {
+        if (!ehQuadrada()) {
+            throw new IllegalArgumentException("Matriz deve ser quadrada para cálculo do determinante");
+        }
+        
+        // Casos base para matrizes pequenas (mais eficiente)
+        if (linhas == 1) return dados[0][0];
+        if (linhas == 2) {
+            // Fórmula direta para matriz 2x2
+            return dados[0][0] * dados[1][1] - dados[0][1] * dados[1][0];
+        }
+        
+        // Expansão por cofatores ao longo da primeira linha
+        double det = 0;
+        for (int j = 0; j < colunas; j++) {
+            det += dados[0][j] * cofator(0, j);
+        }
+        return det;
+    }
+    
+    /**
+     * Calcula o cofator de um elemento
+     * @param linha - linha do elemento
+     * @param coluna - coluna do elemento
+     * @return valor do cofator
+     */
+    private double cofator(int linha, int coluna) {
+        Matriz menor = menorMatriz(linha, coluna);
+        // Fórmula do cofator: (-1)^(i+j) * determinante do menor
+        return Math.pow(-1, linha + coluna) * menor.determinante();
+    }
+    
+    /**
+     * Cria a matriz menor (remove uma linha e uma coluna)
+     * @param linhaRemover - linha a ser removida
+     * @param colunaRemover - coluna a ser removida
+     * @return nova matriz menor
+     */
+    private Matriz menorMatriz(int linhaRemover, int colunaRemover) {
+        // Cria matriz com dimensões reduzidas
+        Matriz menor = new Matriz(linhas - 1, colunas - 1);
+        
+        int iMenor = 0;
+        // Percorre todas as linhas da matriz original
+        for (int i = 0; i < linhas; i++) {
+            // Pula a linha que deve ser removida
+            if (i == linhaRemover) continue;
+            
+            int jMenor = 0;
+            // Percorre todas as colunas da matriz original
+            for (int j = 0; j < colunas; j++) {
+                // Pula a coluna que deve ser removida
+                if (j == colunaRemover) continue;
+                
+                // Copia o elemento para a matriz menor
+                menor.dados[iMenor][jMenor] = dados[i][j];
+                jMenor++;
+            }
+            iMenor++;
+        }
+        return menor;
+    }
+    
+    // =========================================================================
+    // MÉTODOS PÚBLICOS AUXILIARES
+    // =========================================================================
+    
+    /**
+     * Retorna representação em string da matriz
+     * @return string formatada com os elementos da matriz
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        // Formata cada linha da matriz
+        for (int i = 0; i < linhas; i++) {
+            sb.append("[ ");
+            for (int j = 0; j < colunas; j++) {
+                // Formata cada número com 2 casas decimais
+                sb.append(String.format("%8.2f", dados[i][j]));
+                if (j < colunas - 1) sb.append(" ");
+            }
+            sb.append(" ]\n");
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Retorna o número de linhas da matriz
+     * @return número de linhas
+     */
+    public int getLinhas() {
+        return linhas;
+    }
+    
+    /**
+     * Retorna o número de colunas da matriz
+     * @return número de colunas
+     */
+    public int getColunas() {
+        return colunas;
+    }
+}
+
+// =============================================================================
+// CLASSE PRINCIPAL MAIN
+// =============================================================================
+
+/**
+ * CLASSE MAIN
+ * Contém a interface com o usuário e o método principal
+ * Gerencia o menu interativo e a criação de matrizes
+ */
+public class Main {
+    // Scanner global para entrada de dados em toda a aplicação
+    private static Scanner scanner = new Scanner(System.in);
+    
+    // =========================================================================
+    // MÉTODOS AUXILIARES PARA INTERAÇÃO COM USUÁRIO
+    // =========================================================================
+    
+    /**
+     * Cria uma matriz através de entrada do usuário
+     * @return matriz preenchida com dados do usuário
+     */
+    public static Matriz criarMatrizUsuario() {
+        // Solicita dimensões da matriz
+        System.out.print("Digite o número de linhas: ");
+        int linhas = scanner.nextInt();
+        System.out.print("Digite o número de colunas: ");
+        int colunas = scanner.nextInt();
+        scanner.nextLine(); // Limpa o buffer do teclado
+        
+        // Cria nova matriz com as dimensões especificadas
+        Matriz matriz = new Matriz(linhas, colunas);
+        System.out.println("Digite os elementos da matriz linha por linha:");
+        
+        // Preenche a matriz elemento por elemento
+        for (int i = 0; i < linhas; i++) {
+            System.out.println("Linha " + (i + 1) + ":");
+            for (int j = 0; j < colunas; j++) {
+                System.out.print("  Elemento [" + (i + 1) + "," + (j + 1) + "]: ");
+                matriz.setElemento(i, j, scanner.nextDouble());
+            }
+        }
+        scanner.nextLine(); // Limpa o buffer do teclado
+        return matriz;
+    }
+    
+    /**
+     * Exibe todas as propriedades de uma matriz
+     * @param matriz - matriz a ser analisada
+     * @param nome - nome da matriz para exibição
+     */
+    private static void verificarPropriedades(Matriz matriz, String nome) {
+        System.out.println("\n=== PROPRIEDADES DA MATRIZ " + nome + " ===");
+        System.out.println("Dimensões: " + matriz.getLinhas() + "x" + matriz.getColunas());
+        System.out.println("É quadrada? " + (matriz.getLinhas() == matriz.getColunas()));
+        
+        // Só verifica estas propriedades se a matriz for quadrada
+        if (matriz.getLinhas() == matriz.getColunas()) {
+            System.out.println("É identidade? " + matriz.ehIdentidade());
+            System.out.println("É diagonal? " + matriz.ehDiagonal());
+            System.out.println("É simétrica? " + matriz.ehSimetrica());
+            System.out.println("É anti-simétrica? " + matriz.ehAntiSimetrica());
+            
+            // Tenta calcular o determinante (pode falhar para matrizes muito grandes)
+            try {
+                double determinante = matriz.determinante();
+                System.out.println("Determinante: " + determinante);
+                System.out.println("É singular? " + matriz.ehSingular());
+            } catch (Exception e) {
+                System.out.println("Não foi possível calcular o determinante");
+            }
+        }
+    }
+    
+    // =========================================================================
+    // MÉTODO PRINCIPAL
+    // =========================================================================
+    
+    /**
+     * Método principal - ponto de entrada do programa
+     * Controla o fluxo do menu interativo
+     */
+    public static void main(String[] args) {
+        System.out.println("=== SISTEMA DE OPERAÇÕES MATRICIAIS ===");
+        
+        // Matrizes que serão manipuladas pelo usuário
+        Matriz A = null;
+        Matriz B = null;
+        
+        int opcao; // Armazena a escolha do usuário no menu
+        
+        // LOOP PRINCIPAL do menu
+        do {
+            // Exibe o menu de opções
+            System.out.println("\n=== MENU PRINCIPAL ===");
+            System.out.println("1. Criar matriz A");
+            System.out.println("2. Criar matriz B");
+            System.out.println("3. Soma (A + B)");
+            System.out.println("4. Subtração (A - B)");
+            System.out.println("5. Multiplicação (A × B)");
+            System.out.println("6. Transposta de A");
+            System.out.println("7. Transposta de B");
+            System.out.println("8. Matriz oposta de A");
+            System.out.println("9. Matriz oposta de B");
+            System.out.println("10. Verificar propriedades da matriz A");
+            System.out.println("11. Verificar propriedades da matriz B");
+            System.out.println("12. Determinante de A");
+            System.out.println("13. Determinante de B");
+            System.out.println("14. Comparar A e B");
+            System.out.println("0. Sair");
+            System.out.print("Escolha uma opção: ");
+            
+            // Lê e valida a entrada do usuário
+            try {
+                opcao = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                opcao = -1; // Valor inválido
+            }
+            
+            // Processa a opção escolhida
+            switch (opcao) {
+                case 1: // Criar matriz A
+                    A = criarMatrizUsuario();
+                    System.out.println("Matriz A criada:\n" + A);
+                    break;
+                    
+                case 2: // Criar matriz B
+                    B = criarMatrizUsuario();
+                    System.out.println("Matriz B criada:\n" + B);
+                    break;
+                    
+                case 3: // Soma A + B
+                    if (A != null && B != null) {
+                        try {
+                            Matriz soma = A.somar(B);
+                            System.out.println("A + B =\n" + soma);
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Erro: " + e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Crie ambas as matrizes primeiro!");
+                    }
+                    break;
+                    
+                case 4: // Subtração A - B
+                    if (A != null && B != null) {
+                        try {
+                            Matriz subtracao = A.subtrair(B);
+                            System.out.println("A - B =\n" + subtracao);
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Erro: " + e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Crie ambas as matrizes primeiro!");
+                    }
+                    break;
+                    
+                case 5: // Multiplicação A × B
+                    if (A != null && B != null) {
+                        try {
+                            Matriz multiplicacao = A.multiplicar(B);
+                            System.out.println("A × B =\n" + multiplicacao);
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Erro: " + e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Crie ambas as matrizes primeiro!");
+                    }
+                    break;
+                    
+                case 6: // Transposta de A
+                    if (A != null) {
+                        Matriz transpostaA = A.transposta();
+                        System.out.println("Transposta de A:\n" + transpostaA);
+                    } else {
+                        System.out.println("Crie a matriz A primeiro!");
+                    }
+                    break;
+                    
+                case 7: // Transposta de B
+                    if (B != null) {
+                        Matriz transpostaB = B.transposta();
+                        System.out.println("Transposta de B:\n" + transpostaB);
+                    } else {
+                        System.out.println("Crie a matriz B primeiro!");
+                    }
+                    break;
+                    
+                case 8: // Matriz oposta de A
+                    if (A != null) {
+                        Matriz opostaA = A.oposta();
+                        System.out.println("Oposta de A:\n" + opostaA);
+                    } else {
+                        System.out.println("Crie a matriz A primeiro!");
+                    }
+                    break;
+                    
+                case 9: // Matriz oposta de B
+                    if (B != null) {
+                        Matriz opostaB = B.oposta();
+                        System.out.println("Oposta de B:\n" + opostaB);
+                    } else {
+                        System.out.println("Crie a matriz B primeiro!");
+                    }
+                    break;
+                    
+                case 10: // Verificar propriedades de A
+                    if (A != null) {
+                        verificarPropriedades(A, "A");
+                    } else {
+                        System.out.println("Crie a matriz A primeiro!");
+                    }
+                    break;
+                    
+                case 11: // Verificar propriedades de B
+                    if (B != null) {
+                        verificarPropriedades(B, "B");
+                    } else {
+                        System.out.println("Crie a matriz B primeiro!");
+                    }
+                    break;
+                    
+                case 12: // Determinante de A
+                    if (A != null) {
+                        try {
+                            double detA = A.determinante();
+                            System.out.println("Determinante de A: " + detA);
+                            System.out.println("A é singular? " + A.ehSingular());
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Erro: " + e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Crie a matriz A primeiro!");
+                    }
+                    break;
+                    
+                case 13: // Determinante de B
+                    if (B != null) {
+                        try {
+                            double detB = B.determinante();
+                            System.out.println("Determinante de B: " + detB);
+                            System.out.println("B é singular? " + B.ehSingular());
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Erro: " + e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Crie a matriz B primeiro!");
+                    }
+                    break;
+                    
+                case 14: // Comparar A e B
+                    if (A != null && B != null) {
+                        System.out.println("A é igual a B? " + A.equals(B));
+                    } else {
+                        System.out.println("Crie ambas as matrizes primeiro!");
+                    }
+                    break;
+                    
+                case 0: // Sair do programa
+                    System.out.println("Saindo do sistema...");
+                    break;
+                    
+                default: // Opção inválida
+                    System.out.println("Opção inválida!");
+            }
+            
+        } while (opcao != 0); // Repete até o usuário escolher sair
+        
+        // Fecha o scanner para liberar recursos
+        scanner.close();
+    }
+}
