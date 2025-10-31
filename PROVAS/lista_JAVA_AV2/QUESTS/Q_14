@@ -1,0 +1,264 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+class Estoque {
+    private HashMap<String, Integer> produtos = new HashMap<>();
+    private static final String ARQUIVO_ESTOQUE = "estoque.csv";
+    
+    // Construtor - carrega dados ao iniciar
+    public Estoque() {
+        carregarDados();
+    }
+    
+    // Método para carregar dados do arquivo
+    private void carregarDados() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO_ESTOQUE))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] partes = linha.split(",");
+                if (partes.length == 2) {
+                    String nome = partes[0];
+                    int quantidade = Integer.parseInt(partes[1]);
+                    produtos.put(nome, quantidade);
+                }
+            }
+            System.out.println("Dados carregados do arquivo: " + produtos.size() + " produtos");
+        } catch (FileNotFoundException e) {
+            System.out.println("Arquivo de estoque não encontrado. Iniciando com estoque vazio.");
+        } catch (IOException e) {
+            System.out.println("Erro ao ler arquivo: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Erro no formato do arquivo.");
+        }
+    }
+    
+    // Método para salvar dados no arquivo
+    private void salvarDados() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_ESTOQUE))) {
+            for (Map.Entry<String, Integer> entry : produtos.entrySet()) {
+                writer.println(entry.getKey() + "," + entry.getValue());
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar arquivo: " + e.getMessage());
+        }
+    }
+    
+    // a) Métodos para adicionar, remover e atualizar produtos (agora salvam automaticamente)
+    
+    public void adicionarProduto(String nome, int quantidade) {
+        if (produtos.containsKey(nome)) {
+            System.out.println("Produto já existe! Use a opção 'Atualizar' para modificar a quantidade.");
+        } else {
+            produtos.put(nome, quantidade);
+            salvarDados(); // Salva após modificar
+            System.out.println("Produto '" + nome + "' adicionado com " + quantidade + " unidades.");
+        }
+    }
+    
+    public void removerProduto(String nome) {
+        if (produtos.containsKey(nome)) {
+            produtos.remove(nome);
+            salvarDados(); // Salva após modificar
+            System.out.println("Produto '" + nome + "' removido do estoque.");
+        } else {
+            System.out.println("Produto '" + nome + "' não encontrado no estoque.");
+        }
+    }
+    
+    public void atualizarProduto(String nome, int novaQuantidade) {
+        if (produtos.containsKey(nome)) {
+            produtos.put(nome, novaQuantidade);
+            salvarDados(); // Salva após modificar
+            System.out.println("Produto '" + nome + "' atualizado para " + novaQuantidade + " unidades.");
+        } else {
+            System.out.println("Produto '" + nome + "' não encontrado. Use a opção 'Adicionar' primeiro.");
+        }
+    }
+    
+    // b) Método que exiba todos os produtos e quantidades
+    public void exibirTodosProdutos() {
+        if (produtos.isEmpty()) {
+            System.out.println("Estoque vazio! Nenhum produto cadastrado.");
+            return;
+        }
+        
+        System.out.println("\n=== ESTOQUE COMPLETO ===");
+        System.out.printf("%-20s | %-10s\n", "PRODUTO", "QUANTIDADE");
+        System.out.println("-----------------------|------------");
+        
+        for (Map.Entry<String, Integer> entry : produtos.entrySet()) {
+            System.out.printf("%-20s | %-10d\n", entry.getKey(), entry.getValue());
+        }
+        System.out.println("================================\n");
+    }
+    
+    // c) Método que retorne o produto com maior quantidade em estoque
+    public void exibirProdutoComMaiorQuantidade() {
+        if (produtos.isEmpty()) {
+            System.out.println("Estoque vazio! Nenhum produto para analisar.");
+            return;
+        }
+        
+        String produtoMaior = "";
+        int maiorQuantidade = Integer.MIN_VALUE;
+        
+        for (Map.Entry<String, Integer> entry : produtos.entrySet()) {
+            if (entry.getValue() > maiorQuantidade) {
+                maiorQuantidade = entry.getValue();
+                produtoMaior = entry.getKey();
+            }
+        }
+        
+        System.out.println("\n=== PRODUTO COM MAIOR ESTOQUE ===");
+        System.out.println("Produto: " + produtoMaior);
+        System.out.println("Quantidade: " + maiorQuantidade + " unidades");
+        System.out.println("==================================\n");
+    }
+    
+    // Método auxiliar para verificar se um produto existe
+    public boolean produtoExiste(String nome) {
+        return produtos.containsKey(nome);
+    }
+    
+    // Método para obter a quantidade de um produto específico
+    public int getQuantidade(String nome) {
+        return produtos.getOrDefault(nome, -1);
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Estoque estoque = new Estoque(); // Já carrega os dados automaticamente
+        
+        // Garante que os dados serão salvos ao sair
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Salvando dados...");
+        }));
+        
+        while (true) {
+            exibirMenuPrincipal();
+            System.out.print("Opção: ");
+            
+            int opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+            
+            switch (opcao) {
+                case 1:
+                    adicionarProdutoInterface(scanner, estoque);
+                    break;
+                    
+                case 2:
+                    removerProdutoInterface(scanner, estoque);
+                    break;
+                    
+                case 3:
+                    atualizarProdutoInterface(scanner, estoque);
+                    break;
+                    
+                case 4:
+                    Estoque.limparTela();
+                    estoque.exibirTodosProdutos();
+                    pausar(scanner);
+                    break;
+                    
+                case 5:
+                    Estoque.limparTela();
+                    estoque.exibirProdutoComMaiorQuantidade();
+                    pausar(scanner);
+                    break;
+                    
+                case 6:
+                    System.out.println("Saindo do sistema de estoque...");
+                    scanner.close();
+                    return;
+                    
+                default:
+                    System.out.println("Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void exibirMenuPrincipal() {
+        Estoque.limparTela();
+        System.out.println("=== SISTEMA DE CONTROLE DE ESTOQUE ===");
+        System.out.println("1 - Adicionar produto");
+        System.out.println("2 - Remover produto");
+        System.out.println("3 - Atualizar quantidade");
+        System.out.println("4 - Exibir todos os produtos");
+        System.out.println("5 - Produto com maior estoque");
+        System.out.println("6 - Sair");
+        System.out.println("======================================");
+    }
+    
+    public static void adicionarProdutoInterface(Scanner scanner, Estoque estoque) {
+        Estoque.limparTela();
+        System.out.println("=== ADICIONAR PRODUTO ===");
+        
+        System.out.print("Nome do produto: ");
+        String nome = scanner.nextLine();
+        
+        System.out.print("Quantidade inicial: ");
+        int quantidade = scanner.nextInt();
+        
+        estoque.adicionarProduto(nome, quantidade);
+        pausar(scanner);
+    }
+    
+    public static void removerProdutoInterface(Scanner scanner, Estoque estoque) {
+        Estoque.limparTela();
+        System.out.println("=== REMOVER PRODUTO ===");
+        
+        System.out.print("Nome do produto a remover: ");
+        String nome = scanner.nextLine();
+        
+        estoque.removerProduto(nome);
+        pausar(scanner);
+    }
+    
+    public static void atualizarProdutoInterface(Scanner scanner, Estoque estoque) {
+        Estoque.limparTela();
+        System.out.println("=== ATUALIZAR QUANTIDADE ===");
+        
+        System.out.print("Nome do produto: ");
+        String nome = scanner.nextLine();
+        
+        if (estoque.produtoExiste(nome)) {
+            System.out.println("Produto atual: " + nome);
+            System.out.println("Quantidade atual: " + estoque.getQuantidade(nome));
+            System.out.print("Nova quantidade: ");
+            int novaQuantidade = scanner.nextInt();
+            
+            estoque.atualizarProduto(nome, novaQuantidade);
+        } else {
+            System.out.println("Produto '" + nome + "' não encontrado!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void pausar(Scanner scanner) {
+        System.out.println("\nPressione Enter para continuar...");
+        scanner.nextLine(); // Limpar buffer do nextInt anterior
+    }
+}
