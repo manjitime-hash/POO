@@ -1,0 +1,226 @@
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Iterator;
+
+class GerenciadorUsuarios {
+    private HashSet<String> usuarios = new HashSet<>();
+    
+    // a) Método para adicionar usuários
+    public boolean adicionarUsuario(String nomeUsuario) {
+        // HashSet NÃO permite duplicatas - retorna false se já existir
+        boolean adicionado = usuarios.add(nomeUsuario);
+        
+        if (adicionado) {
+            System.out.println("✅ Usuário '" + nomeUsuario + "' cadastrado com sucesso!");
+        } else {
+            System.out.println("❌ Usuário '" + nomeUsuario + "' já existe! Duplicata não permitida.");
+        }
+        return adicionado;
+    }
+    
+    // a) Método para remover usuários
+    public boolean removerUsuario(String nomeUsuario) {
+        boolean removido = usuarios.remove(nomeUsuario);
+        
+        if (removido) {
+            System.out.println("🗑️ Usuário '" + nomeUsuario + "' removido com sucesso!");
+        } else {
+            System.out.println("⚠️ Usuário '" + nomeUsuario + "' não encontrado!");
+        }
+        return removido;
+    }
+    
+    // b) Método que exiba todos os usuários cadastrados
+    public void exibirTodosUsuarios() {
+        if (usuarios.isEmpty()) {
+            System.out.println("📭 Nenhum usuário cadastrado no sistema.");
+            return;
+        }
+        
+        System.out.println("\n=== USUÁRIOS CADASTRADOS ===");
+        System.out.println("Total de usuários únicos: " + usuarios.size());
+        
+        // Usando Iterator para percorrer o HashSet
+        Iterator<String> iterator = usuarios.iterator();
+        int contador = 1;
+        
+        while (iterator.hasNext()) {
+            System.out.println(contador + ". " + iterator.next());
+            contador++;
+        }
+        System.out.println("============================\n");
+    }
+    
+    // Método auxiliar para verificar se usuário existe
+    public boolean usuarioExiste(String nomeUsuario) {
+        return usuarios.contains(nomeUsuario);
+    }
+    
+    // Método para obter quantidade de usuários
+    public int getQuantidadeUsuarios() {
+        return usuarios.size();
+    }
+    
+    // c) Método para testar comportamento de não duplicação
+    public void testarNaoDuplicacao() {
+        System.out.println("\n🧪 TESTE DE NÃO DUPLICAÇÃO");
+        
+        if (usuarios.isEmpty()) {
+            System.out.println("Adicione alguns usuários primeiro para testar.");
+            return;
+        }
+        
+        // Pega o primeiro usuário para testar duplicata
+        String primeiroUsuario = usuarios.iterator().next();
+        
+        System.out.println("Tentando adicionar duplicata: '" + primeiroUsuario + "'");
+        System.out.println("Quantidade antes: " + usuarios.size());
+        
+        boolean resultado = adicionarUsuario(primeiroUsuario);
+        
+        System.out.println("Quantidade depois: " + usuarios.size());
+        System.out.println("Resultado: " + (resultado ? "Adicionado" : "Rejeitado (comportamento correto)"));
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        GerenciadorUsuarios gerenciador = new GerenciadorUsuarios();
+        
+        while (true) {
+            exibirMenuPrincipal();
+            System.out.print("Opção: ");
+            
+            int opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+            
+            switch (opcao) {
+                case 1:
+                    adicionarUsuarioInterface(scanner, gerenciador);
+                    break;
+                    
+                case 2:
+                    removerUsuarioInterface(scanner, gerenciador);
+                    break;
+                    
+                case 3:
+                    GerenciadorUsuarios.limparTela();
+                    gerenciador.exibirTodosUsuarios();
+                    pausar(scanner);
+                    break;
+                    
+                case 4:
+                    GerenciadorUsuarios.limparTela();
+                    gerenciador.testarNaoDuplicacao();
+                    pausar(scanner);
+                    break;
+                    
+                case 5:
+                    testarComportamentoHashSet();
+                    pausar(scanner);
+                    break;
+                    
+                case 6:
+                    System.out.println("👋 Saindo do sistema...");
+                    scanner.close();
+                    return;
+                    
+                default:
+                    System.out.println("❌ Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void exibirMenuPrincipal() {
+        GerenciadorUsuarios.limparTela();
+        System.out.println("=== 🎯 GERENCIADOR DE USUÁRIOS ===");
+        System.out.println("1 - Adicionar usuário");
+        System.out.println("2 - Remover usuário");
+        System.out.println("3 - Exibir todos os usuários");
+        System.out.println("4 - Testar não duplicação");
+        System.out.println("5 - Demonstração HashSet");
+        System.out.println("6 - Sair");
+        System.out.println("=================================");
+    }
+    
+    public static void adicionarUsuarioInterface(Scanner scanner, GerenciadorUsuarios gerenciador) {
+        GerenciadorUsuarios.limparTela();
+        System.out.println("=== 👤 ADICIONAR USUÁRIO ===");
+        
+        System.out.print("Nome do usuário: ");
+        String nome = scanner.nextLine().trim();
+        
+        if (!nome.isEmpty()) {
+            gerenciador.adicionarUsuario(nome);
+        } else {
+            System.out.println("❌ Nome não pode ser vazio!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void removerUsuarioInterface(Scanner scanner, GerenciadorUsuarios gerenciador) {
+        GerenciadorUsuarios.limparTela();
+        System.out.println("=== 🗑️ REMOVER USUÁRIO ===");
+        
+        System.out.print("Nome do usuário a remover: ");
+        String nome = scanner.nextLine().trim();
+        
+        if (!nome.isEmpty()) {
+            gerenciador.removerUsuario(nome);
+        } else {
+            System.out.println("❌ Nome não pode ser vazio!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    // Demonstração do comportamento do HashSet
+    public static void testarComportamentoHashSet() {
+        GerenciadorUsuarios.limparTela();
+        System.out.println("=== 🔬 DEMONSTRAÇÃO HASHSET ===");
+        
+        GerenciadorUsuarios demo = new GerenciadorUsuarios();
+        
+        System.out.println("\n1. Adicionando usuários únicos:");
+        demo.adicionarUsuario("Alice");
+        demo.adicionarUsuario("Bob");
+        demo.adicionarUsuario("Carlos");
+        
+        System.out.println("\n2. Tentando adicionar duplicatas:");
+        demo.adicionarUsuario("Alice");  // Deve ser rejeitado
+        demo.adicionarUsuario("Bob");    // Deve ser rejeitado
+        
+        System.out.println("\n3. Usuários finais (apenas únicos):");
+        demo.exibirTodosUsuarios();
+        
+        System.out.println("4. Testando case sensitivity:");
+        demo.adicionarUsuario("alice");  // Diferente de "Alice"
+        demo.adicionarUsuario("ALICE");  // Diferente de "Alice"
+        
+        System.out.println("\n5. Resultado final:");
+        demo.exibirTodosUsuarios();
+    }
+    
+    public static void pausar(Scanner scanner) {
+        System.out.println("\n⏎ Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+}
