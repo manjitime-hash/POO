@@ -1,0 +1,243 @@
+// Importações necessárias para o funcionamento do programa
+import java.util.ArrayList;  // Para usar a lista dinâmica ArrayList
+import java.util.List;       // Para usar a interface List
+import java.util.Scanner;    // Para ler entrada do usuário
+
+/**
+ * CLASSE ConjuntoSimples
+ * Representa um conjunto matemático de elementos String sem repetições
+ * Implementa operações básicas de teoria dos conjuntos
+ */
+class ConjuntoSimples {
+    // ATRIBUTOS DA CLASSE
+    private List<String> elementos;  // Lista que armazena os elementos do conjunto
+    
+    // CONSTRUTOR
+    // Inicializa a lista de elementos vazia
+    public ConjuntoSimples() {
+        this.elementos = new ArrayList<>();  // Cria uma ArrayList vazia
+    }
+    
+    // MÉTODO: adicionar (Item a do requisito)
+    // Adiciona um elemento ao conjunto, evitando repetições
+    public void adicionar(String elemento) {
+        // Verifica se o elemento não é nulo E se não está já no conjunto
+        if (elemento != null && !contem(elemento)) {
+            elementos.add(elemento);  // Adiciona à lista se passar nas verificações
+        }
+        // Se elemento for nulo ou já existir, simplesmente ignora (não faz nada)
+    }
+    
+    // MÉTODO: contem (Item b do requisito)
+    // Verifica se um elemento específico está presente no conjunto
+    public boolean contem(String elemento) {
+        // Usa o método contains da ArrayList para verificar existência
+        return elementos.contains(elemento);
+    }
+    
+    // MÉTODO: uniao (Item c do requisito)
+    // Retorna um NOVO conjunto com a união deste conjunto com outro
+    // União = todos os elementos de A + todos os elementos de B (sem repetições)
+    public ConjuntoSimples uniao(ConjuntoSimples outro) {
+        ConjuntoSimples resultado = new ConjuntoSimples();  // Cria novo conjunto para resultado
+        
+        // Adiciona todos os elementos do conjunto atual (this)
+        for (String elemento : this.elementos) {
+            resultado.adicionar(elemento);  // O método adicionar evita duplicatas automaticamente
+        }
+        
+        // Adiciona todos os elementos do outro conjunto
+        for (String elemento : outro.elementos) {
+            resultado.adicionar(elemento);  // Duplicatas são automaticamente ignoradas
+        }
+        
+        return resultado;  // Retorna o novo conjunto com a união
+    }
+    
+    // MÉTODO: inter (Item d do requisito)
+    // Retorna um NOVO conjunto com a interseção deste conjunto com outro
+    // Interseção = apenas os elementos que existem em AMBOS os conjuntos
+    public ConjuntoSimples inter(ConjuntoSimples outro) {
+        ConjuntoSimples resultado = new ConjuntoSimples();  // Cria novo conjunto para resultado
+        
+        // Percorre todos os elementos do conjunto atual
+        for (String elemento : this.elementos) {
+            // Se o elemento também existe no outro conjunto...
+            if (outro.contem(elemento)) {
+                resultado.adicionar(elemento);  // ...adiciona ao resultado
+            }
+        }
+        
+        return resultado;  // Retorna o novo conjunto com a interseção
+    }
+    
+    // MÉTODO: menos (Item e do requisito)
+    // Retorna um NOVO conjunto com a diferença entre este conjunto e outro
+    // Diferença A - B = elementos que estão em A mas NÃO estão em B
+    public ConjuntoSimples menos(ConjuntoSimples outro) {
+        ConjuntoSimples resultado = new ConjuntoSimples();  // Cria novo conjunto para resultado
+        
+        // Percorre todos os elementos do conjunto atual
+        for (String elemento : this.elementos) {
+            // Se o elemento NÃO existe no outro conjunto...
+            if (!outro.contem(elemento)) {
+                resultado.adicionar(elemento);  // ...adiciona ao resultado
+            }
+        }
+        
+        return resultado;  // Retorna o novo conjunto com a diferença
+    }
+    
+    // MÉTODO: tamanho
+    // Retorna quantos elementos existem no conjunto
+    public int tamanho() {
+        return elementos.size();  // Usa o método size() da ArrayList
+    }
+    
+    // MÉTODO: toString (sobrescrito)
+    // Retorna uma representação em string do conjunto
+    // Formato: [elemento1, elemento2, elemento3, ...]
+    @Override
+    public String toString() {
+        return elementos.toString();  // Usa o toString() da ArrayList
+    }
+}
+
+/**
+ * CLASSE Main
+ * Classe principal que contém o método main e a interface com o usuário
+ * Gerencia a interação com o usuário e coordena as operações
+ */
+public class Main {
+    // Scanner global para ler entrada do usuário em toda a aplicação
+    private static Scanner scanner = new Scanner(System.in);
+    
+    /**
+     * MÉTODO: criarConjuntoUsuario
+     * Permite que o usuário crie um conjunto digitando elementos via console
+     * @param nomeConjunto - Nome do conjunto sendo criado (para exibição)
+     * @return ConjuntoSimples preenchido com os elementos digitados pelo usuário
+     */
+    public static ConjuntoSimples criarConjuntoUsuario(String nomeConjunto) {
+        // Cria um novo conjunto vazio
+        ConjuntoSimples conjunto = new ConjuntoSimples();
+        
+        System.out.println("\n=== Criando Conjunto " + nomeConjunto + " ===");
+        
+        // Loop infinito até o usuário digitar "fim"
+        while (true) {
+            System.out.print("Digite um elemento (ou 'fim' para terminar): ");
+            String elemento = scanner.nextLine().trim();  // Lê e remove espaços extras
+            
+            // Verifica se o usuário quer terminar
+            if (elemento.equalsIgnoreCase("fim")) {
+                break;  // Sai do loop
+            }
+            
+            // Se o elemento não estiver vazio, adiciona ao conjunto
+            if (!elemento.isEmpty()) {
+                conjunto.adicionar(elemento);
+                System.out.println("Elemento '" + elemento + "' adicionado ao conjunto " + nomeConjunto);
+            }
+        }
+        
+        return conjunto;  // Retorna o conjunto criado
+    }
+    
+    /**
+     * MÉTODO: main
+     * Ponto de entrada principal do programa
+     * Controla o fluxo geral da aplicação e o menu interativo
+     */
+    public static void main(String[] args) {
+        // Cabeçalho do sistema
+        System.out.println("=== SISTEMA DE CONJUNTOS ===");
+        
+        // Cria os conjuntos A e B com dados fornecidos pelo usuário
+        ConjuntoSimples A = criarConjuntoUsuario("A");
+        ConjuntoSimples B = criarConjuntoUsuario("B");
+        
+        int opcao;  // Variável para armazenar a escolha do usuário no menu
+        
+        // LOOP PRINCIPAL do menu - executa até o usuário escolher sair (opção 0)
+        do {
+            // Exibe o menu de opções
+            System.out.println("\n=== MENU DE OPERAÇÕES ===");
+            System.out.println("Conjunto A: " + A);  // Mostra estado atual do conjunto A
+            System.out.println("Conjunto B: " + B);  // Mostra estado atual do conjunto B
+            System.out.println("1. União (A ∪ B)");
+            System.out.println("2. Interseção (A ∩ B)");
+            System.out.println("3. Diferença (A - B)");
+            System.out.println("4. Diferença (B - A)");
+            System.out.println("5. Verificar se elemento pertence a A");
+            System.out.println("6. Verificar se elemento pertence a B");
+            System.out.println("7. Adicionar elemento a A");
+            System.out.println("8. Adicionar elemento a B");
+            System.out.println("0. Sair");
+            System.out.print("Escolha uma opção: ");
+            
+            // Tratamento de erro para entrada não numérica
+            try {
+                opcao = Integer.parseInt(scanner.nextLine());  // Lê e converte para inteiro
+            } catch (NumberFormatException e) {
+                opcao = -1;  // Valor inválido se usuário não digitar número
+            }
+            
+            // ESTRUTURA SWITCH - processa a opção escolhida pelo usuário
+            switch (opcao) {
+                case 1:  // União A ∪ B
+                    System.out.println("União A ∪ B: " + A.uniao(B));
+                    break;
+                    
+                case 2:  // Interseção A ∩ B
+                    System.out.println("Interseção A ∩ B: " + A.inter(B));
+                    break;
+                    
+                case 3:  // Diferença A - B
+                    System.out.println("Diferença A - B: " + A.menos(B));
+                    break;
+                    
+                case 4:  // Diferença B - A
+                    System.out.println("Diferença B - A: " + B.menos(A));
+                    break;
+                    
+                case 5:  // Verificar pertinência em A
+                    System.out.print("Digite o elemento a verificar em A: ");
+                    String elementoA = scanner.nextLine();
+                    System.out.println("Elemento '" + elementoA + "' pertence a A: " + A.contem(elementoA));
+                    break;
+                    
+                case 6:  // Verificar pertinência em B
+                    System.out.print("Digite o elemento a verificar em B: ");
+                    String elementoB = scanner.nextLine();
+                    System.out.println("Elemento '" + elementoB + "' pertence a B: " + B.contem(elementoB));
+                    break;
+                    
+                case 7:  // Adicionar elemento a A
+                    System.out.print("Digite o elemento a adicionar em A: ");
+                    String novoA = scanner.nextLine();
+                    A.adicionar(novoA);
+                    System.out.println("Conjunto A atualizado: " + A);
+                    break;
+                    
+                case 8:  // Adicionar elemento a B
+                    System.out.print("Digite o elemento a adicionar em B: ");
+                    String novoB = scanner.nextLine();
+                    B.adicionar(novoB);
+                    System.out.println("Conjunto B atualizado: " + B);
+                    break;
+                    
+                case 0:  // Sair do programa
+                    System.out.println("Saindo do sistema...");
+                    break;
+                    
+                default:  // Opção inválida
+                    System.out.println("Opção inválida!");
+            }
+            
+        } while (opcao != 0);  // Condição de saída do loop: opção = 0
+        
+        // Fecha o scanner para liberar recursos
+        scanner.close();
+    }
+}
