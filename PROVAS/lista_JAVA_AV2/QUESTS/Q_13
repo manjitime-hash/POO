@@ -1,0 +1,211 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Boletim {
+    private ArrayList<Double> notas = new ArrayList<>();
+    
+    public void adicionarNota(double nota) {
+        notas.add(nota);
+    }
+    
+    public void adicionarTresNotas(double nota1, double nota2, double nota3) {
+        notas.add(nota1);
+        notas.add(nota2);
+        notas.add(nota3);
+    }
+    
+    public double calcularMedia() {
+        if (notas.isEmpty()) return 0.0;
+        
+        double soma = 0;
+        for (double nota : notas) {
+            soma += nota;
+        }
+        return soma / notas.size();
+    }
+    
+    public double encontrarMaiorNota() {
+        if (notas.isEmpty()) return 0.0;
+        
+        double maior = notas.get(0);
+        for (double nota : notas) {
+            if (nota > maior) maior = nota;
+        }
+        return maior;
+    }
+    
+    public double encontrarMenorNota() {
+        if (notas.isEmpty()) return 0.0;
+        
+        double menor = notas.get(0);
+        for (double nota : notas) {
+            if (nota < menor) menor = nota;
+        }
+        return menor;
+    }
+    
+    // Métodos de exibição separados
+    public void exibirTodasNotas() {
+        System.out.println("\n--- TODAS AS NOTAS ---");
+        if (notas.isEmpty()) {
+            System.out.println("Nenhuma nota cadastrada.");
+        } else {
+            for (int i = 0; i < notas.size(); i++) {
+                System.out.printf("Nota %d: %.2f\n", i + 1, notas.get(i));
+            }
+        }
+        System.out.println("----------------------");
+    }
+    
+    public void exibirMedia() {
+        System.out.println("\n--- MÉDIA ---");
+        System.out.printf("Média aritmética: %.2f\n", calcularMedia());
+        System.out.println("-------------");
+    }
+    
+    public void exibirMaiorEMenor() {
+        System.out.println("\n--- MAIOR E MENOR NOTA ---");
+        System.out.printf("Maior nota: %.2f\n", encontrarMaiorNota());
+        System.out.printf("Menor nota: %.2f\n", encontrarMenorNota());
+        System.out.println("--------------------------");
+    }
+    
+    public void exibirResumoCompleto() {
+        System.out.println("\n=== BOLETIM COMPLETO ===");
+        exibirTodasNotas();
+        exibirMedia();
+        exibirMaiorEMenor();
+        System.out.println("========================\n");
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Boletim boletim = new Boletim();
+        
+        while (true) {
+            exibirMenuPrincipal();
+            System.out.print("Opção: ");
+            
+            int opcao = scanner.nextInt();
+            
+            switch (opcao) {
+                case 1:
+                    adicionarTresNotas(scanner, boletim);
+                    break;
+                    
+                case 2:
+                    exibirSubmenuNotas(scanner, boletim);
+                    break;
+                    
+                case 3:
+                    System.out.println("Saindo...");
+                    scanner.close();
+                    return;
+                    
+                default:
+                    System.out.println("Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void exibirMenuPrincipal() {
+        Boletim.limparTela();
+        System.out.println("=== SISTEMA DE BOLETIM ===");
+        System.out.println("1 - Adicionar três notas");
+        System.out.println("2 - Consultar informações");
+        System.out.println("3 - Sair");
+        System.out.println("==========================");
+    }
+    
+    public static void exibirSubmenuNotas(Scanner scanner, Boletim boletim) {
+        while (true) {
+            Boletim.limparTela();
+            System.out.println("=== CONSULTAR INFORMAÇÕES ===");
+            System.out.println("1 - Exibir todas as notas");
+            System.out.println("2 - Exibir média");
+            System.out.println("3 - Exibir maior e menor nota");
+            System.out.println("4 - Exibir boletim completo");
+            System.out.println("5 - Voltar ao menu principal");
+            System.out.println("=============================");
+            System.out.print("Opção: ");
+            
+            int subOpcao = scanner.nextInt();
+            
+            switch (subOpcao) {
+                case 1:
+                    Boletim.limparTela();
+                    boletim.exibirTodasNotas();
+                    pausar(scanner);
+                    break;
+                    
+                case 2:
+                    Boletim.limparTela();
+                    boletim.exibirMedia();
+                    pausar(scanner);
+                    break;
+                    
+                case 3:
+                    Boletim.limparTela();
+                    boletim.exibirMaiorEMenor();
+                    pausar(scanner);
+                    break;
+                    
+                case 4:
+                    Boletim.limparTela();
+                    boletim.exibirResumoCompleto();
+                    pausar(scanner);
+                    break;
+                    
+                case 5:
+                    return;
+                    
+                default:
+                    System.out.println("Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void adicionarTresNotas(Scanner scanner, Boletim boletim) {
+        Boletim.limparTela();
+        System.out.println("=== ADICIONAR TRÊS NOTAS ===");
+        
+        System.out.print("Digite a primeira nota: ");
+        double nota1 = scanner.nextDouble();
+        
+        System.out.print("Digite a segunda nota: ");
+        double nota2 = scanner.nextDouble();
+        
+        System.out.print("Digite a terceira nota: ");
+        double nota3 = scanner.nextDouble();
+        
+        boletim.adicionarTresNotas(nota1, nota2, nota3);
+        
+        System.out.println("\nTrês notas adicionadas com sucesso!");
+        pausar(scanner);
+    }
+    
+    public static void pausar(Scanner scanner) {
+        System.out.println("\nPressione Enter para continuar...");
+        scanner.nextLine(); // limpar buffer
+        scanner.nextLine(); // aguardar Enter
+    }
+}
