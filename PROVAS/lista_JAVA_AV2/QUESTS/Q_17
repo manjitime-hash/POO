@@ -1,0 +1,289 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class UrnaEletronica {
+    private HashMap<String, String> votos = new HashMap<>(); // 🗺️ CPF → Candidato
+    private HashMap<String, Integer> contagemVotos = new HashMap<>(); // 🗺️ Candidato → Total de votos
+    
+    // a) Método para registrar votos sem duplicação
+    public boolean registrarVoto(String cpf, String candidato) {
+        if (votos.containsKey(cpf)) { // 🗺️ Verifica se CPF já votou
+            System.out.println("❌ CPF " + cpf + " já votou! Voto não computado.");
+            return false;
+        }
+        
+        votos.put(cpf, candidato); // 🗺️ Registra voto (CPF → Candidato)
+        
+        // Atualiza contagem de votos do candidato
+        contagemVotos.put(candidato, contagemVotos.getOrDefault(candidato, 0) + 1); // 🗺️ getOrDefault evita NullPointerException
+        
+        System.out.println("✅ Voto registrado com sucesso!");
+        System.out.println("   CPF: " + cpf);
+        System.out.println("   Candidato: " + candidato);
+        return true;
+    }
+    
+    // b) Método que exiba todos os votos
+    public void exibirTodosVotos() {
+        if (votos.isEmpty()) { // 🗺️ Verifica se há votos
+            System.out.println("📭 Nenhum voto registrado ainda.");
+            return;
+        }
+        
+        System.out.println("\n=== 🗳️ TODOS OS VOTOS REGISTRADOS ===");
+        System.out.println("Total de eleitores que votaram: " + votos.size()); // 🗺️ Quantidade de votos
+        System.out.printf("%-15s | %-20s\n", "CPF", "CANDIDATO");
+        System.out.println("----------------|----------------------");
+        
+        for (Map.Entry<String, String> entry : votos.entrySet()) { // 🗺️ Itera todos os pares
+            System.out.printf("%-15s | %-20s\n", entry.getKey(), entry.getValue()); // 🗺️ getKey() e getValue()
+        }
+        System.out.println("======================================\n");
+    }
+    
+    // c) Método que calcule o total de votos por candidato
+    public void exibirResultadoParcial() {
+        if (contagemVotos.isEmpty()) { // 🗺️ Verifica se há votos
+            System.out.println("📭 Nenhum voto computado ainda.");
+            return;
+        }
+        
+        System.out.println("\n=== 📊 RESULTADO PARCIAL DA ELEIÇÃO ===");
+        System.out.printf("%-20s | %-10s\n", "CANDIDATO", "VOTOS");
+        System.out.println("---------------------|------------");
+        
+        for (Map.Entry<String, Integer> entry : contagemVotos.entrySet()) { // 🗺️ Itera contagem
+            System.out.printf("%-20s | %-10d\n", entry.getKey(), entry.getValue());
+        }
+        System.out.println("Total de votantes: " + votos.size());
+        System.out.println("====================================\n");
+    }
+    
+    // Método para buscar voto por CPF
+    public void buscarVotoPorCPF(String cpf) {
+        if (votos.containsKey(cpf)) { // 🗺️ Verifica se CPF votou
+            String candidato = votos.get(cpf); // 🗺️ Busca candidato votado
+            System.out.println("🔍 CPF " + cpf + " votou em: " + candidato);
+        } else {
+            System.out.println("🔍 CPF " + cpf + " ainda não votou.");
+        }
+    }
+    
+    // Método para verificar se CPF já votou
+    public boolean cpfJaVotou(String cpf) {
+        return votos.containsKey(cpf); // 🗺️ Verificação rápida O(1)
+    }
+    
+    // Método para obter candidato mais votado
+    public void exibirCandidatoMaisVotado() {
+        if (contagemVotos.isEmpty()) {
+            System.out.println("📭 Nenhum voto computado.");
+            return;
+        }
+        
+        String candidatoMaisVotado = "";
+        int maiorVotos = 0;
+        
+        for (Map.Entry<String, Integer> entry : contagemVotos.entrySet()) { // 🗺️ Itera para encontrar maior
+            if (entry.getValue() > maiorVotos) {
+                maiorVotos = entry.getValue();
+                candidatoMaisVotado = entry.getKey();
+            }
+        }
+        
+        System.out.println("\n=== 🏆 CANDIDATO MAIS VOTADO ===");
+        System.out.println("Candidato: " + candidatoMaisVotado);
+        System.out.println("Votos: " + maiorVotos);
+        System.out.println("==============================\n");
+    }
+    
+    // Método para reiniciar a urna (apagar todos os votos)
+    public void reiniciarUrna() {
+        votos.clear(); // 🗺️ Limpa todos os votos
+        contagemVotos.clear(); // 🗺️ Limpa contagem
+        System.out.println("🔄 Urna reiniciada! Todos os votos foram apagados.");
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        UrnaEletronica urna = new UrnaEletronica();
+        
+        while (true) {
+            exibirMenuPrincipal();
+            System.out.print("Opção: ");
+            
+            int opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+            
+            switch (opcao) {
+                case 1:
+                    registrarVotoInterface(scanner, urna);
+                    break;
+                    
+                case 2:
+                    UrnaEletronica.limparTela();
+                    urna.exibirTodosVotos();
+                    pausar(scanner);
+                    break;
+                    
+                case 3:
+                    UrnaEletronica.limparTela();
+                    urna.exibirResultadoParcial();
+                    pausar(scanner);
+                    break;
+                    
+                case 4:
+                    buscarVotoInterface(scanner, urna);
+                    break;
+                    
+                case 5:
+                    UrnaEletronica.limparTela();
+                    urna.exibirCandidatoMaisVotado();
+                    pausar(scanner);
+                    break;
+                    
+                case 6:
+                    demonstrarFuncionalidades(urna);
+                    pausar(scanner);
+                    break;
+                    
+                case 7:
+                    System.out.println("🔒 Encerrando sistema de votação...");
+                    scanner.close();
+                    return;
+                    
+                default:
+                    System.out.println("❌ Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void exibirMenuPrincipal() {
+        UrnaEletronica.limparTela();
+        System.out.println("=== 🗳️ URNA ELETRÔNICA ===");
+        System.out.println("1 - Registrar voto");
+        System.out.println("2 - Exibir todos os votos");
+        System.out.println("3 - Exibir resultado parcial");
+        System.out.println("4 - Buscar voto por CPF");
+        System.out.println("5 - Candidato mais votado");
+        System.out.println("6 - Demonstração do sistema");
+        System.out.println("7 - Sair");
+        System.out.println("=========================");
+    }
+    
+    public static void registrarVotoInterface(Scanner scanner, UrnaEletronica urna) {
+        UrnaEletronica.limparTela();
+        System.out.println("=== ✅ REGISTRAR VOTO ===");
+        
+        System.out.print("Digite o CPF: ");
+        String cpf = scanner.nextLine().trim();
+        
+        // Validação simples de CPF
+        if (cpf.length() != 11 || !cpf.matches("\\d+")) {
+            System.out.println("❌ CPF inválido! Deve conter 11 dígitos.");
+            pausar(scanner);
+            return;
+        }
+        
+        // Verifica se CPF já votou
+        if (urna.cpfJaVotou(cpf)) {
+            System.out.println("❌ Este CPF já votou! Voto não permitido.");
+            pausar(scanner);
+            return;
+        }
+        
+        System.out.println("\nCandidatos disponíveis:");
+        System.out.println("1 - João Silva");
+        System.out.println("2 - Maria Santos");
+        System.out.println("3 - Pedro Oliveira");
+        System.out.println("4 - Voto Nulo");
+        System.out.println("5 - Voto em Branco");
+        System.out.print("Escolha o candidato (1-5): ");
+        
+        int opcaoCandidato = scanner.nextInt();
+        scanner.nextLine(); // Limpar buffer
+        
+        String candidato;
+        switch (opcaoCandidato) {
+            case 1: candidato = "João Silva"; break;
+            case 2: candidato = "Maria Santos"; break;
+            case 3: candidato = "Pedro Oliveira"; break;
+            case 4: candidato = "Nulo"; break;
+            case 5: candidato = "Branco"; break;
+            default: 
+                System.out.println("❌ Opção inválida! Voto não registrado.");
+                pausar(scanner);
+                return;
+        }
+        
+        urna.registrarVoto(cpf, candidato);
+        pausar(scanner);
+    }
+    
+    public static void buscarVotoInterface(Scanner scanner, UrnaEletronica urna) {
+        UrnaEletronica.limparTela();
+        System.out.println("=== 🔍 BUSCAR VOTO POR CPF ===");
+        
+        System.out.print("Digite o CPF: ");
+        String cpf = scanner.nextLine().trim();
+        
+        if (cpf.length() != 11 || !cpf.matches("\\d+")) {
+            System.out.println("❌ CPF inválido! Deve conter 11 dígitos.");
+        } else {
+            urna.buscarVotoPorCPF(cpf);
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void demonstrarFuncionalidades(UrnaEletronica urna) {
+        UrnaEletronica.limparTela();
+        System.out.println("=== 🧪 DEMONSTRAÇÃO DO SISTEMA ===");
+        
+        System.out.println("\n1. Registrando votos...");
+        urna.registrarVoto("12345678901", "João Silva");
+        urna.registrarVoto("23456789012", "Maria Santos");
+        urna.registrarVoto("34567890123", "João Silva");
+        urna.registrarVoto("45678901234", "Pedro Oliveira");
+        
+        System.out.println("\n2. Tentativa de duplicação...");
+        urna.registrarVoto("12345678901", "Maria Santos"); // ❌ Deve falhar
+        
+        System.out.println("\n3. Exibindo todos os votos:");
+        urna.exibirTodosVotos();
+        
+        System.out.println("4. Resultado parcial:");
+        urna.exibirResultadoParcial();
+        
+        System.out.println("5. Candidato mais votado:");
+        urna.exibirCandidatoMaisVotado();
+        
+        System.out.println("6. Buscando votos específicos:");
+        urna.buscarVotoPorCPF("12345678901");
+        urna.buscarVotoPorCPF("99999999999"); // ❌ Não existe
+    }
+    
+    public static void pausar(Scanner scanner) {
+        System.out.println("\n⏎ Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+}
