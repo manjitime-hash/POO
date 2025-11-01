@@ -1,0 +1,329 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class Biblioteca {
+    private HashMap<String, String> catalogo = new HashMap<>();
+    
+    public boolean adicionarLivro(String isbn, String titulo) {
+        if (catalogo.containsKey(isbn)) { // 🗺️ Verifica se chave já existe
+            System.out.println("❌ ISBN '" + isbn + "' já está cadastrado para o livro: " + catalogo.get(isbn));
+            return false;
+        }
+        
+        catalogo.put(isbn, titulo); // 🗺️ Adiciona par (chave, valor)
+        System.out.println("✅ Livro adicionado com sucesso!");
+        return true;
+    }
+    
+    public boolean removerLivro(String isbn) {
+        if (!catalogo.containsKey(isbn)) { // 🗺️ Verifica existência
+            System.out.println("❌ ISBN '" + isbn + "' não encontrado!");
+            return false;
+        }
+        
+        String tituloRemovido = catalogo.remove(isbn); // 🗺️ Remove e retorna valor
+        System.out.println("🗑️ Livro removido: " + tituloRemovido);
+        return true;
+    }
+    
+    public void buscarLivroPorISBN(String isbn) {
+        if (catalogo.containsKey(isbn)) { // 🗺️ Verifica se chave existe
+            String titulo = catalogo.get(isbn); // 🗺️ Busca valor pela chave
+            System.out.println("\n🔍 Livro encontrado:");
+            System.out.println("   ISBN: " + isbn);
+            System.out.println("   Título: " + titulo);
+        } else {
+            System.out.println("❌ Nenhum livro com ISBN: " + isbn);
+        }
+    }
+    
+    public void buscarLivroPorTitulo(String tituloBusca) {
+        System.out.println("\n🔍 Buscando por: '" + tituloBusca + "'");
+        boolean encontrado = false;
+        
+        for (Map.Entry<String, String> entry : catalogo.entrySet()) { // 🗺️ Itera todos os pares
+            String titulo = entry.getValue(); // 🗺️ Pega valor
+            String isbn = entry.getKey(); // 🗺️ Pega chave
+            
+            if (titulo.toLowerCase().contains(tituloBusca.toLowerCase())) {
+                if (!encontrado) {
+                    System.out.println("📚 Livros encontrados:");
+                    encontrado = true;
+                }
+                System.out.println("   ISBN: " + isbn + " | Título: " + titulo);
+            }
+        }
+        
+        if (!encontrado) {
+            System.out.println("❌ Nenhum livro encontrado");
+        }
+    }
+    
+    public void exibirTodosLivros() {
+        if (catalogo.isEmpty()) { // 🗺️ Verifica se mapa está vazio
+            System.out.println("📭 Catálogo vazio!");
+            return;
+        }
+        
+        System.out.println("\n=== 📚 CATÁLOGO COMPLETO ===");
+        System.out.println("Total de livros: " + catalogo.size()); // 🗺️ Tamanho do mapa
+        
+        int contador = 1;
+        for (Map.Entry<String, String> entry : catalogo.entrySet()) { // 🗺️ Itera pares
+            System.out.printf("%d. ISBN: %s | Título: %s\n", 
+                contador, entry.getKey(), entry.getValue()); // 🗺️ getKey() e getValue()
+            contador++;
+        }
+        System.out.println("================================\n");
+    }
+    
+    public boolean tituloExiste(String titulo) {
+        for (String tituloCadastrado : catalogo.values()) { // 🗺️ Itera apenas valores
+            if (tituloCadastrado.equalsIgnoreCase(titulo)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void verificarTituloExistente(String titulo) {
+        boolean existe = false;
+        
+        System.out.println("\n🔎 Verificando título: '" + titulo + "'");
+        
+        for (Map.Entry<String, String> entry : catalogo.entrySet()) { // 🗺️ Itera pares
+            if (entry.getValue().equalsIgnoreCase(titulo)) { // 🗺️ Compara valor
+                if (!existe) {
+                    System.out.println("⚠️ Título já existe:");
+                    existe = true;
+                }
+                System.out.println("   ISBN: " + entry.getKey() + " | Título: " + entry.getValue());
+            }
+        }
+        
+        if (!existe) {
+            System.out.println("✅ Título disponível!");
+        }
+    }
+    
+    public int getQuantidadeLivros() {
+        return catalogo.size(); // 🗺️ Retorna quantidade de pares
+    }
+    
+    public boolean isbnExiste(String isbn) {
+        return catalogo.containsKey(isbn); // 🗺️ Verifica existência da chave
+    }
+    
+    // Método extra: mostrar todos os ISBNs
+    public void mostrarTodosISBNs() {
+        System.out.println("\n=== 🔑 TODOS OS ISBNs ===");
+        for (String isbn : catalogo.keySet()) { // 🗺️ Itera apenas chaves
+            System.out.println("ISBN: " + isbn);
+        }
+    }
+    
+    // Método extra: atualizar título mantendo mesmo ISBN
+    public boolean atualizarTitulo(String isbn, String novoTitulo) {
+        if (catalogo.containsKey(isbn)) {
+            String tituloAntigo = catalogo.put(isbn, novoTitulo); // 🗺️ put() atualiza e retorna valor antigo
+            System.out.println("📝 Título atualizado:");
+            System.out.println("   De: " + tituloAntigo);
+            System.out.println("   Para: " + novoTitulo);
+            return true;
+        }
+        return false;
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Biblioteca biblioteca = new Biblioteca();
+        
+        adicionarLivrosExemplo(biblioteca);
+        
+        while (true) {
+            exibirMenuPrincipal();
+            System.out.print("Opção: ");
+            
+            int opcao = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (opcao) {
+                case 1:
+                    adicionarLivroInterface(scanner, biblioteca);
+                    break;
+                case 2:
+                    removerLivroInterface(scanner, biblioteca);
+                    break;
+                case 3:
+                    buscarLivroInterface(scanner, biblioteca);
+                    break;
+                case 4:
+                    Biblioteca.limparTela();
+                    biblioteca.exibirTodosLivros();
+                    pausar(scanner);
+                    break;
+                case 5:
+                    verificarTituloInterface(scanner, biblioteca);
+                    break;
+                case 6:
+                    demonstrarFuncionalidadesMap(biblioteca);
+                    pausar(scanner);
+                    break;
+                case 7:
+                    System.out.println("👋 Saindo...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("❌ Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void demonstrarFuncionalidadesMap(Biblioteca biblioteca) {
+        Biblioteca.limparTela();
+        System.out.println("=== 🗺️ DEMONSTRAÇÃO FUNÇÕES MAP ===");
+        
+        System.out.println("\n1. 📊 catalogo.size(): " + biblioteca.getQuantidadeLivros());
+        
+        System.out.println("\n2. 🔑 catalogo.keySet() - Todos ISBNs:");
+        for (String isbn : biblioteca.catalogo.keySet()) { // 🗺️ Itera chaves
+            System.out.println("   " + isbn);
+        }
+        
+        System.out.println("\n3. 📖 catalogo.values() - Todos títulos:");
+        for (String titulo : biblioteca.catalogo.values()) { // 🗺️ Itera valores
+            System.out.println("   " + titulo);
+        }
+        
+        System.out.println("\n4. 🔍 catalogo.get() - Buscar ISBN específico:");
+        String isbnTeste = "978-85-359-0277-5";
+        System.out.println("   " + isbnTeste + " → " + biblioteca.catalogo.get(isbnTeste));
+        
+        System.out.println("\n5. ❌ catalogo.remove() - Remover um livro:");
+        biblioteca.removerLivro("978-85-7232-227-8");
+        System.out.println("   Novo tamanho: " + biblioteca.getQuantidadeLivros());
+    }
+    
+    public static void exibirMenuPrincipal() {
+        Biblioteca.limparTela();
+        System.out.println("=== 📚 SISTEMA BIBLIOTECA ===");
+        System.out.println("1 - Adicionar livro");
+        System.out.println("2 - Remover livro");
+        System.out.println("3 - Buscar livro");
+        System.out.println("4 - Exibir catálogo completo");
+        System.out.println("5 - Verificar título existente");
+        System.out.println("6 - Demonstração funções Map");
+        System.out.println("7 - Sair");
+        System.out.println("==============================");
+    }
+    
+    public static void adicionarLivroInterface(Scanner scanner, Biblioteca biblioteca) {
+        Biblioteca.limparTela();
+        System.out.println("=== 📖 ADICIONAR LIVRO ===");
+        
+        System.out.print("ISBN: ");
+        String isbn = scanner.nextLine().trim();
+        
+        System.out.print("Título: ");
+        String titulo = scanner.nextLine().trim();
+        
+        if (!isbn.isEmpty() && !titulo.isEmpty()) {
+            biblioteca.adicionarLivro(isbn, titulo);
+        } else {
+            System.out.println("❌ ISBN e Título não podem ser vazios!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void removerLivroInterface(Scanner scanner, Biblioteca biblioteca) {
+        Biblioteca.limparTela();
+        System.out.println("=== 🗑️ REMOVER LIVRO ===");
+        
+        System.out.print("ISBN do livro a remover: ");
+        String isbn = scanner.nextLine().trim();
+        
+        if (!isbn.isEmpty()) {
+            biblioteca.removerLivro(isbn);
+        } else {
+            System.out.println("❌ ISBN não pode ser vazio!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void buscarLivroInterface(Scanner scanner, Biblioteca biblioteca) {
+        Biblioteca.limparTela();
+        System.out.println("=== 🔍 BUSCAR LIVRO ===");
+        System.out.println("1 - Buscar por ISBN");
+        System.out.println("2 - Buscar por Título");
+        System.out.print("Opção: ");
+        
+        int opcao = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch (opcao) {
+            case 1:
+                System.out.print("Digite o ISBN: ");
+                String isbn = scanner.nextLine().trim();
+                biblioteca.buscarLivroPorISBN(isbn);
+                break;
+            case 2:
+                System.out.print("Digite o título: ");
+                String titulo = scanner.nextLine().trim();
+                biblioteca.buscarLivroPorTitulo(titulo);
+                break;
+            default:
+                System.out.println("❌ Opção inválida!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void verificarTituloInterface(Scanner scanner, Biblioteca biblioteca) {
+        Biblioteca.limparTela();
+        System.out.println("=== 🔎 VERIFICAR TÍTULO ===");
+        
+        System.out.print("Digite o título a verificar: ");
+        String titulo = scanner.nextLine().trim();
+        
+        if (!titulo.isEmpty()) {
+            biblioteca.verificarTituloExistente(titulo);
+        } else {
+            System.out.println("❌ Título não pode ser vazio!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void adicionarLivrosExemplo(Biblioteca biblioteca) {
+        biblioteca.adicionarLivro("978-85-359-0277-5", "Dom Casmurro");
+        biblioteca.adicionarLivro("978-85-7232-227-8", "O Cortiço");
+        biblioteca.adicionarLivro("978-85-325-1114-7", "1984");
+        biblioteca.adicionarLivro("978-85-359-0276-8", "Memórias Póstumas de Brás Cubas");
+    }
+    
+    public static void pausar(Scanner scanner) {
+        System.out.println("\n⏎ Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+}
