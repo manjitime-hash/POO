@@ -1,0 +1,700 @@
+import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+// CLASSE RESERVA
+class Reserva {
+    private String codigo;
+    private LocalDate dataCheckIn;
+    private LocalDate dataCheckOut;
+    private double valor;
+    private boolean ativa;
+    private String tipoQuarto;
+    
+    public Reserva(String codigo, LocalDate dataCheckIn, LocalDate dataCheckOut, double valor, String tipoQuarto) {
+        this.codigo = codigo;
+        this.dataCheckIn = dataCheckIn;
+        this.dataCheckOut = dataCheckOut;
+        this.valor = valor;
+        this.tipoQuarto = tipoQuarto;
+        this.ativa = true;
+    }
+    
+    // Getters
+    public String getCodigo() { return codigo; }
+    public LocalDate getDataCheckIn() { return dataCheckIn; }
+    public LocalDate getDataCheckOut() { return dataCheckOut; }
+    public double getValor() { return valor; }
+    public boolean isAtiva() { return ativa; }
+    public String getTipoQuarto() { return tipoQuarto; }
+    
+    // Setters
+    public void setAtiva(boolean ativa) { this.ativa = ativa; }
+    
+    public int getDuracaoEstadia() {
+        return (int) java.time.temporal.ChronoUnit.DAYS.between(dataCheckIn, dataCheckOut);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Reserva %s | %s a %s (%d dias) | Quarto: %s | Valor: R$ %.2f | Status: %s",
+            codigo, 
+            dataCheckIn.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            dataCheckOut.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            getDuracaoEstadia(),
+            tipoQuarto,
+            valor, 
+            ativa ? "✅ ATIVA" : "❌ CANCELADA");
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Reserva reserva = (Reserva) obj;
+        return Objects.equals(codigo, reserva.codigo);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(codigo);
+    }
+}
+
+// CLASSE CLIENTE
+class Cliente {
+    private String cpf;
+    private String nome;
+    private String email;
+    private String telefone;
+    private List<Reserva> reservas;
+    
+    public Cliente(String cpf, String nome, String email, String telefone) {
+        this.cpf = cpf;
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
+        this.reservas = new ArrayList<>();
+    }
+    
+    // Getters
+    public String getCpf() { return cpf; }
+    public String getNome() { return nome; }
+    public String getEmail() { return email; }
+    public String getTelefone() { return telefone; }
+    public List<Reserva> getReservas() { return new ArrayList<>(reservas); }
+    
+    // Métodos para gerenciar reservas
+    public boolean adicionarReserva(Reserva reserva) {
+        for (Reserva r : reservas) {
+            if (r.getCodigo().equals(reserva.getCodigo())) {
+                return false;
+            }
+        }
+        reservas.add(reserva);
+        return true;
+    }
+    
+    public boolean cancelarReserva(String codigoReserva) {
+        for (Reserva reserva : reservas) {
+            if (reserva.getCodigo().equals(codigoReserva) && reserva.isAtiva()) {
+                reserva.setAtiva(false);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public List<Reserva> getReservasAtivas() {
+        List<Reserva> ativas = new ArrayList<>();
+        for (Reserva reserva : reservas) {
+            if (reserva.isAtiva()) {
+                ativas.add(reserva);
+            }
+        }
+        return ativas;
+    }
+    
+    public List<Reserva> getReservasPorPeriodo(LocalDate inicio, LocalDate fim) {
+        List<Reserva> noPeriodo = new ArrayList<>();
+        for (Reserva reserva : reservas) {
+            if (!reserva.getDataCheckOut().isBefore(inicio) && !reserva.getDataCheckIn().isAfter(fim)) {
+                noPeriodo.add(reserva);
+            }
+        }
+        return noPeriodo;
+    }
+    
+    public double getTotalGasto() {
+        double total = 0;
+        for (Reserva reserva : reservas) {
+            total += reserva.getValor();
+        }
+        return total;
+    }
+    
+    public double getTotalGastoAtivo() {
+        double total = 0;
+        for (Reserva reserva : getReservasAtivas()) {
+            total += reserva.getValor();
+        }
+        return total;
+    }
+    
+    public int getTotalReservas() {
+        return reservas.size();
+    }
+    
+    public int getTotalReservasAtivas() {
+        return getReservasAtivas().size();
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("👤 %s | CPF: %s | Email: %s | Tel: %s | Reservas: %d",
+            nome, cpf, email, telefone, reservas.size());
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Cliente cliente = (Cliente) obj;
+        return Objects.equals(cpf, cliente.cpf);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(cpf);
+    }
+}
+
+// SISTEMA PRINCIPAL
+class SistemaReservas {
+    private Map<String, Cliente> clientes;
+    private Map<String, Reserva> reservas;
+    private Map<String, String> reservaParaCliente;
+    
+    private enum TipoQuarto {
+        STANDARD("Standard", 150.0),
+        LUXO("Luxo", 300.0),
+        SUITE("Suíte", 500.0),
+        PRESIDENCIAL("Presidencial", 1000.0);
+        
+        private final String descricao;
+        private final double valorBase;
+        
+        TipoQuarto(String descricao, double valorBase) {
+            this.descricao = descricao;
+            this.valorBase = valorBase;
+        }
+        
+        public String getDescricao() { return descricao; }
+        public double getValorBase() { return valorBase; }
+    }
+    
+    public SistemaReservas() {
+        this.clientes = new HashMap<>();
+        this.reservas = new HashMap<>();
+        this.reservaParaCliente = new HashMap<>();
+    }
+    
+    // Métodos para gerenciar clientes
+    public boolean cadastrarCliente(String cpf, String nome, String email, String telefone) {
+        if (clientes.containsKey(cpf)) {
+            return false;
+        }
+        
+        if (!validarCPF(cpf)) {
+            return false;
+        }
+        
+        Cliente novoCliente = new Cliente(cpf, nome, email, telefone);
+        clientes.put(cpf, novoCliente);
+        return true;
+    }
+    
+    public Cliente buscarCliente(String cpf) {
+        return clientes.get(cpf);
+    }
+    
+    public boolean removerCliente(String cpf) {
+        Cliente cliente = clientes.get(cpf);
+        if (cliente == null) {
+            return false;
+        }
+        
+        for (Reserva reserva : cliente.getReservas()) {
+            reservas.remove(reserva.getCodigo());
+            reservaParaCliente.remove(reserva.getCodigo());
+        }
+        
+        clientes.remove(cpf);
+        return true;
+    }
+    
+    // Métodos para gerenciar reservas
+    public boolean registrarReserva(String cpf, String codigoReserva, LocalDate dataCheckIn, 
+                                  LocalDate dataCheckOut, String tipoQuartoStr) {
+        Cliente cliente = clientes.get(cpf);
+        if (cliente == null) {
+            return false;
+        }
+        
+        if (reservas.containsKey(codigoReserva)) {
+            return false;
+        }
+        
+        if (dataCheckIn.isAfter(dataCheckOut) || dataCheckIn.isBefore(LocalDate.now())) {
+            return false;
+        }
+        
+        TipoQuarto tipoQuarto;
+        try {
+            tipoQuarto = TipoQuarto.valueOf(tipoQuartoStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        
+        int duracao = (int) java.time.temporal.ChronoUnit.DAYS.between(dataCheckIn, dataCheckOut);
+        double valor = duracao * tipoQuarto.getValorBase();
+        
+        Reserva novaReserva = new Reserva(codigoReserva, dataCheckIn, dataCheckOut, valor, tipoQuarto.getDescricao());
+        
+        if (!cliente.adicionarReserva(novaReserva)) {
+            return false;
+        }
+        
+        reservas.put(codigoReserva, novaReserva);
+        reservaParaCliente.put(codigoReserva, cpf);
+        
+        return true;
+    }
+    
+    public boolean cancelarReserva(String codigoReserva) {
+        Reserva reserva = reservas.get(codigoReserva);
+        if (reserva == null || !reserva.isAtiva()) {
+            return false;
+        }
+        
+        String cpf = reservaParaCliente.get(codigoReserva);
+        Cliente cliente = clientes.get(cpf);
+        
+        if (cliente != null) {
+            return cliente.cancelarReserva(codigoReserva);
+        }
+        
+        return false;
+    }
+    
+    // Consultas
+    public List<Reserva> consultarReservasCliente(String cpf) {
+        Cliente cliente = clientes.get(cpf);
+        if (cliente == null) {
+            return new ArrayList<>();
+        }
+        return cliente.getReservas();
+    }
+    
+    public List<Reserva> consultarReservasAtivasCliente(String cpf) {
+        Cliente cliente = clientes.get(cpf);
+        if (cliente == null) {
+            return new ArrayList<>();
+        }
+        return cliente.getReservasAtivas();
+    }
+    
+    public List<Reserva> consultarReservasPorPeriodo(LocalDate inicio, LocalDate fim) {
+        List<Reserva> reservasNoPeriodo = new ArrayList<>();
+        for (Cliente cliente : clientes.values()) {
+            reservasNoPeriodo.addAll(cliente.getReservasPorPeriodo(inicio, fim));
+        }
+        return reservasNoPeriodo;
+    }
+    
+    // Métodos de agregação
+    public int getTotalReservasAtivas() {
+        int total = 0;
+        for (Cliente cliente : clientes.values()) {
+            total += cliente.getTotalReservasAtivas();
+        }
+        return total;
+    }
+    
+    public double getValorTotalReservasAtivas() {
+        double total = 0;
+        for (Cliente cliente : clientes.values()) {
+            total += cliente.getTotalGastoAtivo();
+        }
+        return total;
+    }
+    
+    public Map<String, Integer> getEstatisticasPorTipoQuarto() {
+        Map<String, Integer> estatisticas = new HashMap<>();
+        for (TipoQuarto tipo : TipoQuarto.values()) {
+            estatisticas.put(tipo.getDescricao(), 0);
+        }
+        
+        for (Reserva reserva : reservas.values()) {
+            if (reserva.isAtiva()) {
+                String tipo = reserva.getTipoQuarto();
+                estatisticas.put(tipo, estatisticas.get(tipo) + 1);
+            }
+        }
+        
+        return estatisticas;
+    }
+    
+    // Métodos de relatório
+    public void exibirRelatorioClientes() {
+        System.out.println("\n=== 📊 RELATÓRIO DE CLIENTES ===");
+        if (clientes.isEmpty()) {
+            System.out.println("Nenhum cliente cadastrado.");
+            return;
+        }
+        
+        List<Cliente> clientesOrdenados = new ArrayList<>(clientes.values());
+        clientesOrdenados.sort((c1, c2) -> c2.getTotalReservas() - c1.getTotalReservas());
+        
+        for (Cliente cliente : clientesOrdenados) {
+            System.out.println(cliente);
+            System.out.printf("  💰 Total gasto: R$ %.2f | 📅 Reservas ativas: %d\n", 
+                cliente.getTotalGasto(), cliente.getTotalReservasAtivas());
+        }
+        System.out.println("================================\n");
+    }
+    
+    public void exibirRelatorioReservas() {
+        System.out.println("\n=== 📋 RELATÓRIO GERAL DE RESERVAS ===");
+        System.out.printf("👥 Total de clientes: %d\n", clientes.size());
+        System.out.printf("📦 Total de reservas: %d\n", reservas.size());
+        System.out.printf("✅ Total de reservas ativas: %d\n", getTotalReservasAtivas());
+        System.out.printf("💰 Valor total em reservas ativas: R$ %.2f\n", getValorTotalReservasAtivas());
+        
+        System.out.println("\n📊 Estatísticas por tipo de quarto:");
+        Map<String, Integer> estatisticas = getEstatisticasPorTipoQuarto();
+        for (Map.Entry<String, Integer> entry : estatisticas.entrySet()) {
+            System.out.printf("   %s: %d reservas\n", entry.getKey(), entry.getValue());
+        }
+        
+        System.out.println("====================================\n");
+    }
+    
+    public void exibirReservasAtivas() {
+        System.out.println("\n=== ✅ RESERVAS ATIVAS ===");
+        int totalAtivas = 0;
+        
+        for (Cliente cliente : clientes.values()) {
+            List<Reserva> ativas = cliente.getReservasAtivas();
+            if (!ativas.isEmpty()) {
+                System.out.println("\n" + cliente.getNome() + ":");
+                for (Reserva reserva : ativas) {
+                    System.out.println("  " + reserva);
+                    totalAtivas++;
+                }
+            }
+        }
+        
+        if (totalAtivas == 0) {
+            System.out.println("Nenhuma reserva ativa no momento.");
+        } else {
+            System.out.printf("\nTotal: %d reservas ativas\n", totalAtivas);
+        }
+        System.out.println("==========================\n");
+    }
+    
+    // Validação de CPF (simplificada)
+    private boolean validarCPF(String cpf) {
+        return cpf != null && cpf.matches("\\d{11}");
+    }
+    
+    // Getters para estatísticas
+    public int getTotalClientes() { return clientes.size(); }
+    public int getTotalReservas() { return reservas.size(); }
+    
+    // Método para obter tipos de quarto disponíveis
+    public void exibirTiposQuarto() {
+        System.out.println("\n=== 🏨 TIPOS DE QUARTO DISPONÍVEIS ===");
+        for (TipoQuarto tipo : TipoQuarto.values()) {
+            System.out.printf("🛏️  %s: R$ %.2f por noite\n", 
+                tipo.getDescricao(), tipo.getValorBase());
+        }
+        System.out.println("====================================\n");
+    }
+    
+    public static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            for (int i = 0; i < 20; i++) {
+                System.out.println();
+            }
+        }
+    }
+}
+
+// CLASSE MAIN (ÚNICA CLASSE PÚBLICA)
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        SistemaReservas sistema = new SistemaReservas();
+        
+        popularDadosExemplo(sistema);
+        
+        while (true) {
+            exibirMenuPrincipal();
+            System.out.print("Opção: ");
+            
+            int opcao = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (opcao) {
+                case 1:
+                    cadastrarClienteInterface(scanner, sistema);
+                    break;
+                case 2:
+                    registrarReservaInterface(scanner, sistema);
+                    break;
+                case 3:
+                    consultarReservasClienteInterface(scanner, sistema);
+                    break;
+                case 4:
+                    cancelarReservaInterface(scanner, sistema);
+                    break;
+                case 5:
+                    SistemaReservas.limparTela();
+                    sistema.exibirRelatorioClientes();
+                    pausar(scanner);
+                    break;
+                case 6:
+                    SistemaReservas.limparTela();
+                    sistema.exibirRelatorioReservas();
+                    pausar(scanner);
+                    break;
+                case 7:
+                    SistemaReservas.limparTela();
+                    sistema.exibirReservasAtivas();
+                    pausar(scanner);
+                    break;
+                case 8:
+                    SistemaReservas.limparTela();
+                    sistema.exibirTiposQuarto();
+                    pausar(scanner);
+                    break;
+                case 9:
+                    demonstrarFuncionalidades(sistema);
+                    pausar(scanner);
+                    break;
+                case 0:
+                    System.out.println("👋 Encerrando sistema de reservas...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("❌ Opção inválida!");
+                    pausar(scanner);
+            }
+        }
+    }
+    
+    public static void exibirMenuPrincipal() {
+        SistemaReservas.limparTela();
+        System.out.println("=== 🏨 SISTEMA DE RESERVAS DE HOSPEDAGEM ===");
+        System.out.println("1 - Cadastrar cliente");
+        System.out.println("2 - Registrar reserva");
+        System.out.println("3 - Consultar reservas de cliente");
+        System.out.println("4 - Cancelar reserva");
+        System.out.println("5 - Relatório de clientes");
+        System.out.println("6 - Relatório geral de reservas");
+        System.out.println("7 - Exibir reservas ativas");
+        System.out.println("8 - Tipos de quarto disponíveis");
+        System.out.println("9 - Demonstração das funcionalidades");
+        System.out.println("0 - Sair");
+        System.out.println("============================================");
+    }
+    
+    public static void cadastrarClienteInterface(Scanner scanner, SistemaReservas sistema) {
+        SistemaReservas.limparTela();
+        System.out.println("=== 👤 CADASTRAR CLIENTE ===");
+        
+        System.out.print("CPF (apenas números): ");
+        String cpf = scanner.nextLine().trim();
+        
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine().trim();
+        
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+        
+        System.out.print("Telefone: ");
+        String telefone = scanner.nextLine().trim();
+        
+        if (cpf.isEmpty() || nome.isEmpty() || email.isEmpty()) {
+            System.out.println("❌ CPF, Nome e Email são obrigatórios!");
+        } else {
+            boolean sucesso = sistema.cadastrarCliente(cpf, nome, email, telefone);
+            if (sucesso) {
+                System.out.println("✅ Cliente cadastrado com sucesso!");
+            } else {
+                System.out.println("❌ Erro ao cadastrar cliente! CPF já existe ou é inválido.");
+            }
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void registrarReservaInterface(Scanner scanner, SistemaReservas sistema) {
+        SistemaReservas.limparTela();
+        System.out.println("=== 📅 REGISTRAR RESERVA ===");
+        
+        System.out.print("CPF do cliente: ");
+        String cpf = scanner.nextLine().trim();
+        
+        Cliente cliente = sistema.buscarCliente(cpf);
+        if (cliente == null) {
+            System.out.println("❌ Cliente não encontrado!");
+            pausar(scanner);
+            return;
+        }
+        
+        System.out.println("Cliente: " + cliente.getNome());
+        
+        System.out.print("Código da reserva: ");
+        String codigo = scanner.nextLine().trim();
+        
+        System.out.print("Data de Check-in (DD/MM/AAAA): ");
+        String dataCheckInStr = scanner.nextLine().trim();
+        
+        System.out.print("Data de Check-out (DD/MM/AAAA): ");
+        String dataCheckOutStr = scanner.nextLine().trim();
+        
+        sistema.exibirTiposQuarto();
+        System.out.print("Tipo de quarto: ");
+        String tipoQuarto = scanner.nextLine().trim();
+        
+        try {
+            LocalDate dataCheckIn = LocalDate.parse(dataCheckInStr, 
+                DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate dataCheckOut = LocalDate.parse(dataCheckOutStr, 
+                DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            
+            boolean sucesso = sistema.registrarReserva(cpf, codigo, dataCheckIn, dataCheckOut, tipoQuarto);
+            if (sucesso) {
+                System.out.println("✅ Reserva registrada com sucesso!");
+            } else {
+                System.out.println("❌ Erro ao registrar reserva! Verifique os dados.");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Data inválida! Use o formato DD/MM/AAAA");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void consultarReservasClienteInterface(Scanner scanner, SistemaReservas sistema) {
+        SistemaReservas.limparTela();
+        System.out.println("=== 🔍 CONSULTAR RESERVAS DO CLIENTE ===");
+        
+        System.out.print("CPF do cliente: ");
+        String cpf = scanner.nextLine().trim();
+        
+        Cliente cliente = sistema.buscarCliente(cpf);
+        if (cliente == null) {
+            System.out.println("❌ Cliente não encontrado!");
+            pausar(scanner);
+            return;
+        }
+        
+        System.out.println("\n" + cliente);
+        
+        List<Reserva> reservas = sistema.consultarReservasCliente(cpf);
+        if (reservas.isEmpty()) {
+            System.out.println("\n📭 Nenhuma reserva encontrada.");
+        } else {
+            System.out.println("\n=== 📋 HISTÓRICO DE RESERVAS ===");
+            for (Reserva reserva : reservas) {
+                System.out.println("  " + reserva);
+            }
+            
+            List<Reserva> reservasAtivas = sistema.consultarReservasAtivasCliente(cpf);
+            System.out.printf("\n📊 Estatísticas:");
+            System.out.printf("\n   ✅ Reservas ativas: %d", reservasAtivas.size());
+            System.out.printf("\n   💰 Total gasto: R$ %.2f", cliente.getTotalGasto());
+            System.out.printf("\n   💰 Total em reservas ativas: R$ %.2f\n", cliente.getTotalGastoAtivo());
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void cancelarReservaInterface(Scanner scanner, SistemaReservas sistema) {
+        SistemaReservas.limparTela();
+        System.out.println("=== ❌ CANCELAR RESERVA ===");
+        
+        System.out.print("Código da reserva: ");
+        String codigo = scanner.nextLine().trim();
+        
+        boolean sucesso = sistema.cancelarReserva(codigo);
+        if (sucesso) {
+            System.out.println("✅ Reserva cancelada com sucesso!");
+        } else {
+            System.out.println("❌ Reserva não encontrada ou já cancelada!");
+        }
+        
+        pausar(scanner);
+    }
+    
+    public static void demonstrarFuncionalidades(SistemaReservas sistema) {
+        SistemaReservas.limparTela();
+        System.out.println("=== 🧪 DEMONSTRAÇÃO DAS FUNCIONALIDADES ===");
+        
+        System.out.println("\n1. 📊 Status inicial do sistema:");
+        sistema.exibirRelatorioReservas();
+        
+        System.out.println("2. 👤 Tentando cadastrar cliente com CPF duplicado:");
+        boolean resultado = sistema.cadastrarCliente("12345678900", "João Silva", "joao@email.com", "11999999999");
+        System.out.println("   Resultado: " + (resultado ? "Sucesso" : "Falha (esperado)"));
+        
+        System.out.println("\n3. 📅 Tentando registrar reserva com código duplicado:");
+        resultado = sistema.registrarReserva("12345678900", "RES001", 
+            LocalDate.now().plusDays(5), LocalDate.now().plusDays(7), "LUXO");
+        System.out.println("   Resultado: " + (resultado ? "Sucesso" : "Falha (esperado)"));
+        
+        System.out.println("\n4. 🔍 Consultando reservas de um cliente:");
+        List<Reserva> reservas = sistema.consultarReservasCliente("12345678900");
+        System.out.println("   Total de reservas: " + reservas.size());
+        
+        System.out.println("\n5. ❌ Cancelando uma reserva:");
+        sistema.cancelarReserva("RES001");
+        
+        System.out.println("\n6. 📊 Status final do sistema:");
+        sistema.exibirRelatorioReservas();
+        sistema.exibirReservasAtivas();
+    }
+    
+    public static void popularDadosExemplo(SistemaReservas sistema) {
+        sistema.cadastrarCliente("12345678900", "João Silva", "joao@email.com", "11999999999");
+        sistema.cadastrarCliente("98765432100", "Maria Santos", "maria@email.com", "11888888888");
+        sistema.cadastrarCliente("11122233344", "Pedro Oliveira", "pedro@email.com", "11777777777");
+        sistema.cadastrarCliente("55566677788", "Ana Costa", "ana@email.com", "11666666666");
+        
+        sistema.registrarReserva("12345678900", "RES001", 
+            LocalDate.now().plusDays(5), LocalDate.now().plusDays(7), "LUXO");
+        sistema.registrarReserva("12345678900", "RES002", 
+            LocalDate.now().plusDays(15), LocalDate.now().plusDays(20), "SUITE");
+        sistema.registrarReserva("98765432100", "RES003", 
+            LocalDate.now().plusDays(3), LocalDate.now().plusDays(6), "STANDARD");
+        sistema.registrarReserva("11122233344", "RES004", 
+            LocalDate.now().plusDays(10), LocalDate.now().plusDays(12), "LUXO");
+        sistema.registrarReserva("55566677788", "RES005", 
+            LocalDate.now().plusDays(7), LocalDate.now().plusDays(14), "PRESIDENCIAL");
+    }
+    
+    public static void pausar(Scanner scanner) {
+        System.out.println("\n⏎ Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+}
