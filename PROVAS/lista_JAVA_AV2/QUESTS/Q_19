@@ -595,6 +595,7 @@ public class Main {
         pausar(scanner);
     }
     
+    // 🔍 MÉTODO QUE ESTAVA FALTANDO - CONSULTAR RESERVAS DO CLIENTE
     public static void consultarReservasClienteInterface(Scanner scanner, SistemaReservas sistema) {
         SistemaReservas.limparTela();
         System.out.println("=== 🔍 CONSULTAR RESERVAS DO CLIENTE ===");
@@ -630,6 +631,7 @@ public class Main {
         pausar(scanner);
     }
     
+    // ❌ MÉTODO QUE ESTAVA FALTANDO - CANCELAR RESERVA
     public static void cancelarReservaInterface(Scanner scanner, SistemaReservas sistema) {
         SistemaReservas.limparTela();
         System.out.println("=== ❌ CANCELAR RESERVA ===");
