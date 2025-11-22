@@ -433,7 +433,7 @@ public class Main extends JFrame {
         cabecalho.setBackground(new Color(70, 130, 180));
         cabecalho.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
 
-        JLabel titulo = new JLabel("📋 Gerenciador de Tarefas");
+        JLabel titulo = new JLabel("Gerenciador de Tarefas");
         titulo.setFont(new Font("Arial", Font.BOLD, 16));
         titulo.setForeground(Color.WHITE);
 
@@ -456,7 +456,7 @@ public class Main extends JFrame {
                 new EmptyBorder(10, 10, 10, 10)
         ));
 
-        JLabel titulo = new JLabel("📁 Tipos de Tarefas");
+        JLabel titulo = new JLabel("Tipos de Tarefas");
         titulo.setFont(new Font("Arial", Font.BOLD, 14));
         titulo.setBorder(new EmptyBorder(0, 0, 10, 0));
 
@@ -522,7 +522,7 @@ public class Main extends JFrame {
         cabecalho.add(criarLabelCabecalho("DIAS"));
         cabecalho.add(criarLabelCabecalho("DIA"));
 
-        // Lista de tarefas
+     
         JPanel listaTarefas = new JPanel();
         listaTarefas.setLayout(new BoxLayout(listaTarefas, BoxLayout.Y_AXIS));
         listaTarefas.setBackground(Color.WHITE);
@@ -536,7 +536,6 @@ public class Main extends JFrame {
         scrollTarefas.setBorder(null);
         scrollTarefas.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Botão nova tarefa
         JPanel painelRodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         painelRodape.setBackground(Color.WHITE);
         painelRodape.setBorder(new EmptyBorder(10, 0, 0, 0));
