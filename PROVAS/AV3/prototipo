@@ -1,0 +1,603 @@
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+
+class Tarefa {
+    private static int contadorId = 1;
+
+    private int id;
+    private String titulo;
+    private LocalDate dataVencimento;
+    private String tipoPasta;
+
+    public Tarefa(String titulo, LocalDate dataVencimento, String tipoPasta) {
+        this.id = contadorId++;
+        this.titulo = titulo;
+        this.dataVencimento = dataVencimento;
+        this.tipoPasta = tipoPasta;
+    }
+
+ 
+    public int getId() { return id; }
+    public String getTitulo() { return titulo; }
+    public LocalDate getDataVencimento() { return dataVencimento; }
+    public String getTipoPasta() { return tipoPasta; }
+
+    public static int getContadorId() { return contadorId; }
+    public static void setContadorId(int novoId) { contadorId = novoId; }
+
+
+    public String getDiasFaltantes() {
+        long dias = ChronoUnit.DAYS.between(LocalDate.now(), dataVencimento);
+        if (dias == 0) return "Hoje";
+        if (dias == 1) return "1 dia";
+        if (dias > 0) return dias + " dias";
+        return "Atrasado";
+    }
+
+    public String getDiaSemana() {
+        String[] diasSemana = {"Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"};
+        return diasSemana[dataVencimento.getDayOfWeek().getValue() % 7];
+    }
+}
+
+
+class PersistenciaMatriz {
+    private static final String ARQUIVO_CSV = "tarefas.csv";
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    // buffer: [id, titulo, data, pasta, status_exportacao]
+    private List<String[]> matrizBuffer;
+
+    public PersistenciaMatriz() {
+        this.matrizBuffer = new ArrayList<>();
+        carregarParaMatriz();
+    }
+
+    // carrega CSV para matriz (só carrega linhas com status != "0")
+    private void carregarParaMatriz() {
+        matrizBuffer.clear();
+
+        if (!Files.exists(Paths.get(ARQUIVO_CSV))) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO_CSV))) {
+            String linha;
+            boolean primeiraLinha = true;
+
+            while ((linha = reader.readLine()) != null) {
+                if (primeiraLinha) {
+                    primeiraLinha = false;
+                    continue; // Pula cabeçalho
+                }
+
+                String[] dados = linha.split(",");
+                if (dados.length >= 5 && !dados[4].equals("0")) {
+                    // Só adiciona na matriz se status não for "0" (não exportar)
+                    matrizBuffer.add(dados);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar matriz: " + e.getMessage());
+        }
+    }
+
+   
+    public void adicionarNaMatriz(String titulo, LocalDate data, String pasta) {
+        int novoId = matrizBuffer.size() + 1;
+        String[] novaLinha = {
+                String.valueOf(novoId),
+                escapeCSV(titulo),
+                data.format(dateFormatter),
+                pasta,
+                "1"  // Status: 1 = exportar, 0 = não exportar
+        };
+        matrizBuffer.add(novaLinha);
+        exportarMatrizParaCSV();
+    }
+
+    public void marcarNaoExportar(int idTarefa) {
+        for (String[] linha : matrizBuffer) {
+            if (linha[0].equals(String.valueOf(idTarefa))) {
+                linha[4] = "0";  // Muda status para "não exportar"
+                break;
+            }
+        }
+        exportarMatrizParaCSV();
+    }
+
+    private void exportarMatrizParaCSV() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ARQUIVO_CSV))) {
+            // Cabeçalho
+            writer.println("id,titulo,data,pasta,status_export");
+
+            // Escreve apenas linhas com status "1"
+            for (String[] linha : matrizBuffer) {
+                if (linha[4].equals("1")) {
+                    writer.println(String.join(",", linha));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao exportar matriz: " + e.getMessage());
+        }
+    }
+
+    public List<Tarefa> carregarTarefasDaMatriz() {
+        List<Tarefa> tarefas = new ArrayList<>();
+
+        for (String[] linha : matrizBuffer) {
+            if (linha[4].equals("1")) {  // Só carrega se status for "1"
+                try {
+                    int id = Integer.parseInt(linha[0]);
+                    String titulo = unescapeCSV(linha[1]);
+                    LocalDate data = LocalDate.parse(linha[2], dateFormatter);
+                    String pasta = linha[3];
+
+                    Tarefa tarefa = new Tarefa(titulo, data, pasta);
+                    tarefas.add(tarefa);
+
+                    // Atualiza contador de IDs
+                    if (Tarefa.getContadorId() <= id) {
+                        Tarefa.setContadorId(id + 1);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao parsear linha da matriz: " + String.join(",", linha));
+                }
+            }
+        }
+
+        return tarefas;
+    }
+
+    
+    public void debugMatriz() {
+        System.out.println("=== MATRIZ BUFFER ===");
+        for (String[] linha : matrizBuffer) {
+            System.out.println(String.join(" | ", linha));
+        }
+        System.out.println("=====================");
+    }
+
+    private String escapeCSV(String texto) {
+        if (texto.contains(",") || texto.contains("\"") || texto.contains("\n")) {
+            return "\"" + texto.replace("\"", "\"\"") + "\"";
+        }
+        return texto;
+    }
+
+    private String unescapeCSV(String texto) {
+        if (texto.startsWith("\"") && texto.endsWith("\"")) {
+            return texto.substring(1, texto.length() - 1).replace("\"\"", "\"");
+        }
+        return texto;
+    }
+}
+
+
+class GerenciadorTarefas {
+    private List<Tarefa> tarefas;
+    private PersistenciaMatriz persistencia;
+
+    public GerenciadorTarefas() {
+        this.persistencia = new PersistenciaMatriz();
+        this.tarefas = persistencia.carregarTarefasDaMatriz();
+
+        // Debug: mostra matriz
+        persistencia.debugMatriz();
+    }
+
+    public void adicionarTarefa(Tarefa tarefa) {
+        tarefas.add(tarefa);
+        persistencia.adicionarNaMatriz(tarefa.getTitulo(), tarefa.getDataVencimento(), tarefa.getTipoPasta());
+    }
+
+    public void marcarComoConcluida(int idTarefa) {
+        // Remove da lista em memória
+        tarefas.removeIf(tarefa -> tarefa.getId() == idTarefa);
+        // Marca na matriz como "não exportar"
+        persistencia.marcarNaoExportar(idTarefa);
+    }
+
+    public List<Tarefa> getTarefas() {
+        return new ArrayList<>(tarefas);
+    }
+
+    public List<Tarefa> getTarefasPorPasta(String pasta) {
+        List<Tarefa> resultado = new ArrayList<>();
+        for (Tarefa tarefa : tarefas) {
+            if (tarefa.getTipoPasta().equals(pasta)) {
+                resultado.add(tarefa);
+            }
+        }
+        return resultado;
+    }
+
+    public Tarefa getTarefaPorId(int id) {
+        for (Tarefa tarefa : tarefas) {
+            if (tarefa.getId() == id) {
+                return tarefa;
+            }
+        }
+        return null;
+    }
+}
+
+class FabricaComponentes {
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final List<String> PASTAS = List.of("Frequentes", "Urgentes", "Simples", "Intermediárias", "Complexas");
+
+    public static JPanel criarItemTarefa(Tarefa tarefa, ActionListener onConcluir) {
+        JPanel item = new JPanel(new BorderLayout());
+        item.setBackground(Color.WHITE);
+        item.setBorder(BorderFactory.createCompoundBorder(
+                new MatteBorder(0, 0, 1, 0, new Color(240, 240, 240)),
+                new EmptyBorder(8, 5, 8, 5)
+        ));
+        item.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Checkbox de conclusão
+        JCheckBox checkConcluida = new JCheckBox();
+        checkConcluida.setPreferredSize(new Dimension(20, 20));
+        checkConcluida.addActionListener(onConcluir);
+
+        // Informações da tarefa
+        JPanel painelInfo = new JPanel(new GridLayout(1, 3, 10, 0));
+        painelInfo.setBackground(item.getBackground());
+
+        JLabel labelTitulo = new JLabel(tarefa.getTitulo());
+        labelTitulo.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        JLabel labelDias = new JLabel(tarefa.getDiasFaltantes());
+        labelDias.setFont(new Font("Arial", Font.PLAIN, 11));
+        labelDias.setForeground(getCorDiasFaltantes(tarefa.getDiasFaltantes()));
+        labelDias.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JLabel labelDiaSemana = new JLabel(tarefa.getDiaSemana());
+        labelDiaSemana.setFont(new Font("Arial", Font.PLAIN, 11));
+        labelDiaSemana.setForeground(Color.GRAY);
+        labelDiaSemana.setHorizontalAlignment(SwingConstants.CENTER);
+
+        painelInfo.add(labelTitulo);
+        painelInfo.add(labelDias);
+        painelInfo.add(labelDiaSemana);
+
+        item.add(checkConcluida, BorderLayout.WEST);
+        item.add(painelInfo, BorderLayout.CENTER);
+
+        return item;
+    }
+
+    public static JPanel criarItemPasta(String nomePasta, boolean selecionada, int contador, MouseListener onClick) {
+        JPanel item = new JPanel(new BorderLayout());
+        item.setBackground(selecionada ? new Color(240, 248, 255) : Color.WHITE);
+        item.setBorder(BorderFactory.createCompoundBorder(
+                new MatteBorder(0, 3, 0, 0, selecionada ? getCorPasta(nomePasta) : Color.WHITE),
+                new EmptyBorder(8, 8, 8, 8)
+        ));
+        item.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JLabel label = new JLabel(nomePasta);
+        label.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        JLabel contadorLabel = new JLabel(String.valueOf(contador));
+        contadorLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        contadorLabel.setForeground(Color.GRAY);
+
+        JPanel painelDireita = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        painelDireita.setBackground(item.getBackground());
+        painelDireita.add(contadorLabel);
+
+        item.add(label, BorderLayout.WEST);
+        item.add(painelDireita, BorderLayout.EAST);
+
+        // Adiciona o MouseListener
+        item.addMouseListener(onClick);
+
+        return item;
+    }
+
+    public static JDialog criarDialogNovaTarefa(JFrame parent, ActionListener onSalvar) {
+        JDialog dialog = new JDialog(parent, "Criar Nova Tarefa", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setLayout(new BorderLayout());
+
+        JPanel painelForm = new JPanel(new GridLayout(3, 2, 10, 10));
+        painelForm.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        painelForm.add(new JLabel("Título:"));
+        JTextField campoTitulo = new JTextField();
+        painelForm.add(campoTitulo);
+
+        painelForm.add(new JLabel("Data (dd/mm/aaaa):"));
+        JTextField campoData = new JTextField();
+        campoData.setText(LocalDate.now().format(dateFormatter));
+        painelForm.add(campoData);
+
+        painelForm.add(new JLabel("Tipo:"));
+        JComboBox<String> comboPasta = new JComboBox<>(PASTAS.toArray(new String[0]));
+        painelForm.add(comboPasta);
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnSalvar = new JButton("Salvar");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        btnSalvar.setBackground(new Color(46, 204, 113));
+        btnSalvar.setForeground(Color.WHITE);
+        btnCancelar.setBackground(new Color(231, 76, 60));
+        btnCancelar.setForeground(Color.WHITE);
+
+        btnSalvar.addActionListener(e -> {
+            String titulo = campoTitulo.getText();
+            String dataTexto = campoData.getText();
+            String pasta = (String) comboPasta.getSelectedItem();
+
+            if (!titulo.trim().isEmpty()) {
+                try {
+                    LocalDate data = LocalDate.parse(dataTexto, dateFormatter);
+                    onSalvar.actionPerformed(new ActionEvent(new Object[] {titulo, data, pasta},
+                            ActionEvent.ACTION_PERFORMED, "salvar"));
+                    dialog.dispose();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(dialog, "Data inválida! Use o formato dd/mm/aaaa");
+                }
+            } else {
+                JOptionPane.showMessageDialog(dialog, "O título é obrigatório!");
+            }
+        });
+
+        btnCancelar.addActionListener(e -> dialog.dispose());
+
+        painelBotoes.add(btnCancelar);
+        painelBotoes.add(btnSalvar);
+
+        dialog.add(painelForm, BorderLayout.CENTER);
+        dialog.add(painelBotoes, BorderLayout.SOUTH);
+
+        return dialog;
+    }
+
+    private static Color getCorDiasFaltantes(String diasFaltantes) {
+        if (diasFaltantes.equals("Atrasado")) return new Color(231, 76, 60);
+        if (diasFaltantes.equals("Hoje")) return new Color(230, 126, 34);
+        if (diasFaltantes.equals("1 dia")) return new Color(241, 196, 15);
+        return new Color(46, 204, 113);
+    }
+
+    private static Color getCorPasta(String pasta) {
+        switch (pasta) {
+            case "Frequentes": return new Color(52, 152, 219);
+            case "Urgentes": return new Color(231, 76, 60);
+            case "Simples": return new Color(46, 204, 113);
+            case "Intermediárias": return new Color(241, 196, 15);
+            case "Complexas": return new Color(155, 89, 182);
+            default: return Color.GRAY;
+        }
+    }
+
+    public static List<String> getPastas() {
+        return new ArrayList<>(PASTAS);
+    }
+}
+
+public class Main extends JFrame {
+    private GerenciadorTarefas gerenciador;
+    private String pastaAtual = "Frequentes";
+
+    private JPanel painelTarefas;
+    private JPanel painelEsquerdo;
+
+    public Main() {
+      
+        gerenciador = new GerenciadorTarefas();
+
+
+        setTitle("Sistema de Gerenciamento de Tarefas");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(900, 500);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(5, 5));
+        getContentPane().setBackground(new Color(245, 245, 245));
+
+
+        add(criarCabecalho(), BorderLayout.NORTH);
+
+        JSplitPane splitPrincipal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPrincipal.setDividerLocation(180);
+        splitPrincipal.setDividerSize(2);
+
+        painelEsquerdo = criarPainelEsquerdo();
+        splitPrincipal.setLeftComponent(painelEsquerdo);
+
+        painelTarefas = criarPainelTarefas();
+        splitPrincipal.setRightComponent(painelTarefas);
+
+        add(splitPrincipal, BorderLayout.CENTER);
+
+        setVisible(true);
+    }
+
+    private JPanel criarCabecalho() {
+        JPanel cabecalho = new JPanel(new BorderLayout());
+        cabecalho.setBackground(new Color(70, 130, 180));
+        cabecalho.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+
+        JLabel titulo = new JLabel("📋 Gerenciador de Tarefas");
+        titulo.setFont(new Font("Arial", Font.BOLD, 16));
+        titulo.setForeground(Color.WHITE);
+
+        JLabel pastaLabel = new JLabel("Pasta: " + pastaAtual);
+        pastaLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        pastaLabel.setForeground(Color.WHITE);
+
+        cabecalho.add(titulo, BorderLayout.WEST);
+        cabecalho.add(pastaLabel, BorderLayout.EAST);
+
+        return cabecalho;
+    }
+
+    private JPanel criarPainelEsquerdo() {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BorderLayout());
+        painel.setBackground(Color.WHITE);
+        painel.setBorder(BorderFactory.createCompoundBorder(
+                new MatteBorder(0, 0, 0, 1, new Color(200, 200, 200)),
+                new EmptyBorder(10, 10, 10, 10)
+        ));
+
+        JLabel titulo = new JLabel("📁 Tipos de Tarefas");
+        titulo.setFont(new Font("Arial", Font.BOLD, 14));
+        titulo.setBorder(new EmptyBorder(0, 0, 10, 0));
+
+        JPanel listaPastas = new JPanel();
+        listaPastas.setLayout(new BoxLayout(listaPastas, BoxLayout.Y_AXIS));
+        listaPastas.setBackground(Color.WHITE);
+
+        for (String pasta : FabricaComponentes.getPastas()) {
+            int contador = gerenciador.getTarefasPorPasta(pasta).size();
+
+            // Criar MouseListener para cada pasta
+            MouseListener mouseListener = new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    pastaAtual = pasta;
+                    atualizarInterface();
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    if (!pasta.equals(pastaAtual)) {
+                        ((JPanel)e.getSource()).setBackground(new Color(250, 250, 250));
+                    }
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    if (!pasta.equals(pastaAtual)) {
+                        ((JPanel)e.getSource()).setBackground(Color.WHITE);
+                    }
+                }
+            };
+
+            listaPastas.add(FabricaComponentes.criarItemPasta(pasta,
+                    pasta.equals(pastaAtual), contador, mouseListener));
+        }
+
+        JScrollPane scrollPastas = new JScrollPane(listaPastas);
+        scrollPastas.setBorder(null);
+
+        painel.add(titulo, BorderLayout.NORTH);
+        painel.add(scrollPastas, BorderLayout.CENTER);
+
+        return painel;
+    }
+
+    private JPanel criarPainelTarefas() {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BorderLayout());
+        painel.setBackground(Color.WHITE);
+        painel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        // Cabeçalho
+        JPanel cabecalho = new JPanel(new GridLayout(1, 4, 5, 0));
+        cabecalho.setBackground(new Color(240, 240, 240));
+        cabecalho.setBorder(BorderFactory.createCompoundBorder(
+                new MatteBorder(0, 0, 1, 0, new Color(200, 200, 200)),
+                new EmptyBorder(5, 5, 5, 5)
+        ));
+
+        cabecalho.add(criarLabelCabecalho(""));
+        cabecalho.add(criarLabelCabecalho("NOTAS"));
+        cabecalho.add(criarLabelCabecalho("DIAS"));
+        cabecalho.add(criarLabelCabecalho("DIA"));
+
+        // Lista de tarefas
+        JPanel listaTarefas = new JPanel();
+        listaTarefas.setLayout(new BoxLayout(listaTarefas, BoxLayout.Y_AXIS));
+        listaTarefas.setBackground(Color.WHITE);
+
+        for (Tarefa tarefa : gerenciador.getTarefasPorPasta(pastaAtual)) {
+            ActionListener concluirListener = e -> concluirTarefa(tarefa.getId());
+            listaTarefas.add(FabricaComponentes.criarItemTarefa(tarefa, concluirListener));
+        }
+
+        JScrollPane scrollTarefas = new JScrollPane(listaTarefas);
+        scrollTarefas.setBorder(null);
+        scrollTarefas.getVerticalScrollBar().setUnitIncrement(16);
+
+        // Botão nova tarefa
+        JPanel painelRodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        painelRodape.setBackground(Color.WHITE);
+        painelRodape.setBorder(new EmptyBorder(10, 0, 0, 0));
+
+        JButton btnNovaTarefa = new JButton("+ Nova Tarefa");
+        btnNovaTarefa.setFont(new Font("Arial", Font.BOLD, 12));
+        btnNovaTarefa.setBackground(new Color(70, 130, 180));
+        btnNovaTarefa.setForeground(Color.WHITE);
+        btnNovaTarefa.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        btnNovaTarefa.addActionListener(e -> abrirCriacaoTarefa());
+
+        painelRodape.add(btnNovaTarefa);
+
+        painel.add(cabecalho, BorderLayout.NORTH);
+        painel.add(scrollTarefas, BorderLayout.CENTER);
+        painel.add(painelRodape, BorderLayout.SOUTH);
+
+        return painel;
+    }
+
+
+    private void concluirTarefa(int idTarefa) {
+        gerenciador.marcarComoConcluida(idTarefa);
+        atualizarInterface();
+    }
+
+    private void abrirCriacaoTarefa() {
+        JDialog dialog = FabricaComponentes.criarDialogNovaTarefa(this, e -> {
+            Object[] dados = (Object[]) e.getSource();
+            String titulo = (String) dados[0];
+            LocalDate data = (LocalDate) dados[1];
+            String pasta = (String) dados[2];
+
+            Tarefa novaTarefa = new Tarefa(titulo, data, pasta);
+            gerenciador.adicionarTarefa(novaTarefa);
+            atualizarInterface();
+        });
+        dialog.setVisible(true);
+    }
+
+    private void atualizarInterface() {
+        painelEsquerdo.removeAll();
+        painelEsquerdo.add(criarPainelEsquerdo(), BorderLayout.CENTER);
+
+        painelTarefas.removeAll();
+        painelTarefas.add(criarPainelTarefas(), BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
+    }
+
+    private JLabel criarLabelCabecalho(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        label.setForeground(Color.DARK_GRAY);
+        return label;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new Main();
+        });
+    }
+}
